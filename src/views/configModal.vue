@@ -291,6 +291,64 @@
                         {{ $t("settings.clear") }}
                       </button>
                     </div>
+
+                    <div class="horizontal-divider my-3"></div>
+                    
+                    <div class="px-1 mb-2">
+                      <h6>{{ $t("settings.cloudSync") }}</h6>
+                      <small class="text-muted">{{ $t("settings.cloudSyncDesc") }}</small>
+                    </div>
+
+                    <div class="form-check form-switch d-flex px-1 mb-3 justify-content-between align-items-center">
+                      <div class="d-flex flex-column">
+                        <label class="form-check-label">{{ $t("settings.uploadToCloud") }}</label>
+                        <small v-if="lastUploadTime" class="text-muted" style="font-size: 0.75rem;">
+                          {{ $t("settings.lastUpload") }}: {{ lastUploadTime }}
+                        </small>
+                      </div>
+                      <button 
+                        type="button" 
+                        class="btn py-1 px-2 border" 
+                        style="width: 140px;"
+                        @click="uploadToCloud"
+                        :disabled="isUploading"
+                      >
+                        <i class="icons bi-cloud-arrow-up mx-2"></i>
+                        {{ isUploading ? $t("settings.uploading") : $t("settings.upload") }}
+                      </button>
+                    </div>
+
+                    <div class="form-check form-switch d-flex px-1 mb-3 justify-content-between align-items-center">
+                      <div class="d-flex flex-column">
+                        <label class="form-check-label">{{ $t("settings.downloadFromCloud") }}</label>
+                        <small v-if="cloudBackupTime" class="text-muted" style="font-size: 0.75rem;">
+                          {{ $t("settings.cloudBackupTime") }}: {{ cloudBackupTime }}
+                        </small>
+                      </div>
+                      <button 
+                        type="button" 
+                        class="btn py-1 px-2 border" 
+                        style="width: 140px;"
+                        @click="downloadFromCloud"
+                        :disabled="isDownloading"
+                      >
+                        <i class="icons bi-cloud-download mx-2"></i>
+                        {{ isDownloading ? $t("settings.downloading") : $t("settings.download") }}
+                      </button>
+                    </div>
+
+                    <div class="form-check form-switch d-flex px-1 mb-3 justify-content-between align-items-center">
+                      <label class="form-check-label">{{ $t("settings.checkSyncStatus") }}</label>
+                      <button 
+                        type="button" 
+                        class="btn py-1 px-2 border" 
+                        style="width: 140px;"
+                        @click="checkSyncStatus"
+                      >
+                        <i class="icons bi-arrow-repeat mx-2"></i>
+                        {{ $t("settings.refresh") }}
+                      </button>
+                    </div>
                   </div>
                   <input type="file" id="file-selector" class="d-none" accept=".wtdb" ref="loadData"
                     @change="importData($event)" />
@@ -335,6 +393,7 @@
 
 <script>
 import configRepository from "../repositories/configRepository";
+import supabaseRepository from "../repositories/supabaseRepository";
 import toastMessage from "../components/toastMessage";
 import exportTool from "../helpers/exportTool";
 import linkList from "../components/linkList";
@@ -351,6 +410,10 @@ export default {
   data() {
     return {
       configData: this.$store.getters.config,
+      isUploading: false,
+      isDownloading: false,
+      lastUploadTime: null,
+      cloudBackupTime: null,
     };
   },
   methods: {
@@ -432,6 +495,62 @@ export default {
         this.$store.getters.config.notificationSound
       );
     },
+
+    // 云同步功能
+    async uploadToCloud() {
+      this.isUploading = true;
+      try {
+        const result = await exportTool.uploadToCloud();
+        if (result.success) {
+          this.lastUploadTime = new Date().toLocaleString();
+          await this.checkSyncStatus();
+          alert(this.$t("settings.uploadSuccess") || "上传成功");
+        } else {
+          alert(this.$t("settings.uploadError") || "上传失败: " + result.message);
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        alert(this.$t("settings.uploadError") || "上传失败: " + error.message);
+      } finally {
+        this.isUploading = false;
+      }
+    },
+
+    async downloadFromCloud() {
+      this.isDownloading = true;
+      try {
+        const result = await exportTool.downloadFromCloud();
+        if (result.success) {
+          alert(this.$t("settings.downloadSuccess") || "下载成功，应用将重新加载");
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } else {
+          alert(this.$t("settings.downloadError") || "下载失败: " + result.message);
+        }
+      } catch (error) {
+        console.error('Download error:', error);
+        alert(this.$t("settings.downloadError") || "下载失败: " + error.message);
+      } finally {
+        this.isDownloading = false;
+      }
+    },
+
+    async checkSyncStatus() {
+      try {
+        const status = await supabaseRepository.getSyncStatus();
+        if (status.exists) {
+          this.cloudBackupTime = new Date(status.lastModified).toLocaleString();
+        } else {
+          this.cloudBackupTime = null;
+        }
+      } catch (error) {
+        console.error('Check sync status failed:', error);
+      }
+    },
+  },
+  mounted() {
+    this.checkSyncStatus();
   },
   computed: {
     configLinks: function () {

@@ -1,5 +1,6 @@
 import storageRepository from "../repositories/storageRepository";
 import dbRepository from "../repositories/dbRepository";
+import supabaseRepository from "../repositories/supabaseRepository";
 import { Toast, Modal } from "bootstrap";
 import migrations from "../migrations/migrations";
 import isElectron from "is-electron";
@@ -65,6 +66,72 @@ export default {
         };
       };
     };
+  },
+
+  /**
+   * 上传到云端
+   */
+  async uploadToCloud() {
+    try {
+      const data = await this.exportToJson();
+      const jsonString = JSON.stringify(data);
+      
+      const result = await supabaseRepository.uploadBackup(jsonString);
+      
+      return { success: true, message: '上传成功', data: result };
+    } catch (error) {
+      console.error('Upload to cloud failed:', error);
+      return { success: false, message: error.message };
+    }
+  },
+
+  /**
+   * 从云端下载
+   */
+  async downloadFromCloud() {
+    try {
+      const jsonString = await supabaseRepository.downloadLatestBackup();
+      const data = JSON.parse(jsonString);
+      
+      if (!('config' in data)) {
+        throw new Error('无效的备份文件');
+      }
+      
+      importData(data);
+      migrations.migrate();
+      
+      return { success: true, message: '下载成功' };
+    } catch (error) {
+      console.error('Download from cloud failed:', error);
+      return { success: false, message: error.message };
+    }
+  },
+
+  /**
+   * 导出为 JSON（用于云同步）
+   */
+  async exportToJson() {
+    return new Promise((resolve) => {
+      var data = storageRepository.as_json();
+      data.todoLists = {};
+      data.repeating_events = {};
+      data.repeating_events_by_date = {};
+      let db_req = dbRepository.open();
+
+      db_req.onsuccess = function (event) {
+        var db = event.target.result;
+        let request = dbRepository.selectAll(db, "todo_lists");
+        request.onsuccess = function () {
+          let cursor = request.result;
+          if (cursor) {
+            data.todoLists[cursor.key] = cursor.value;
+            cursor.continue();
+          } else {
+            collectRepeatinEventData(data, event, resolve);
+          }
+        };
+      };
+    });
   },
 };
 
@@ -186,4 +253,34 @@ function importDbRecords(db, data_a, table) {
       }
     };
   }
+}
+
+// 收集重复事件数据（用于云同步）
+function collectRepeatinEventData(data, event, resolve) {
+  var db = event.target.result;
+  let request = dbRepository.selectAll(db, "repeating_events");
+  request.onsuccess = function () {
+    let cursor = request.result;
+    if (cursor) {
+      data.repeating_events[cursor.key] = cursor.value;
+      cursor.continue();
+    } else {
+      collectRepeatinEventByDateData(data, event, resolve);
+    }
+  };
+}
+
+// 收集按日期的重复事件数据（用于云同步）
+function collectRepeatinEventByDateData(data, event, resolve) {
+  var db = event.target.result;
+  let request = dbRepository.selectAll(db, "repeating_events_by_date");
+  request.onsuccess = function () {
+    let cursor = request.result;
+    if (cursor) {
+      data.repeating_events_by_date[cursor.key] = cursor.value;
+      cursor.continue();
+    } else {
+      resolve(data);
+    }
+  };
 }
