@@ -30,7 +30,7 @@
     "node": "20.x"
   },
   "dependencies": {
-    "@achrinza/node-ipc": "^10.1.13",
+    "@achrinza/node-ipc": "^10.1.12",
     "@manuelernestog/click-handler": "^1.4.0",
     "@popperjs/core": "^2.11.0",
     "@sentry/vue": "^7.99.0",
