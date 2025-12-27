@@ -12,11 +12,11 @@ export default {
    */
   async getOrCreateAnonymousUser() {
     try {
-      const { data: { user }, error } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase.auth.getUser()
       
       if (!user) {
-        const { data, error: signInError } = await supabase.auth.signInAnonymously()
-        if (signInError) throw signInError
+        const { data } = await supabase.auth.signInAnonymously()
+        if (!data) throw new Error('Failed to sign in anonymously')
         return data.user
       }
       
@@ -41,7 +41,7 @@ export default {
       // 将字符串转换为 Blob
       const blob = new Blob([fileContent], { type: 'application/json' })
       
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('backups')
         .upload(filePath, blob, {
           contentType: 'application/json',
@@ -141,7 +141,6 @@ export default {
   async getSyncStatus() {
     try {
       const user = await this.getOrCreateAnonymousUser()
-      const filePath = `${user.id}/latest.wtdb`
       
       const { data, error } = await supabase.storage
         .from('backups')

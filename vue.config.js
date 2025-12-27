@@ -1,5 +1,10 @@
 module.exports = {
   publicPath: './',
+  transpileDependencies: [
+    '@supabase/supabase-js',
+    '@supabase/storage-js',
+    'iceberg-js'
+  ],
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,
