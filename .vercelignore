@@ -1,0 +1,15 @@
+node_modules
+.git
+.gitignore
+*.log
+.DS_Store
+.env.local
+.env.*.local
+dist_electron
+build
+*.md
+!README.md
+FEASIBILITY_ANALYSIS.md
+CONTRIBUTING.md
+SECURITY.md
+changelog.md
