@@ -26,6 +26,9 @@
   },
   "main": "background.js",
   "repository": "https://github.com/manuelernestog/weektodo",
+  "engines": {
+    "node": "18.x"
+  },
   "dependencies": {
     "@achrinza/node-ipc": "^10.1.10",
     "@manuelernestog/click-handler": "^1.4.0",
