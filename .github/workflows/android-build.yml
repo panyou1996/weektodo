@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: 'yarn'
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -29,10 +29,10 @@ jobs:
           java-version: '17'
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: Build web app
-        run: npm run build
+        run: yarn build 
         env:
           NODE_OPTIONS: --openssl-legacy-provider
 
