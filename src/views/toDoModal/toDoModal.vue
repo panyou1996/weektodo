@@ -811,14 +811,42 @@ export default {
   max-width: 650px;
 }
 
+  /* 头部图标按钮 - 参照搜索框设计 */
 .header-menu-icons {
-  margin-left: 6px;
-  @include btn-icon;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  color: #1c1c1e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  font-size: 1.125rem;
+  
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  :global(.dark-theme) & {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f5f5f7;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  }
 }
 
 .header-menu-icons.bi-x {
-  font-size: 1.9rem;
-  padding: 0px;
+  font-size: 1.5rem;
 }
 
 .modal.modal-static .modal-dialog {
@@ -855,37 +883,32 @@ export default {
     max-height: calc(100vh - 80px);
     display: flex;
     flex-direction: column;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     border-radius: 16px;
     border: none;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
+                0 4px 16px rgba(0, 0, 0, 0.08);
+    
+    :global(.dark-theme) & {
+      background: rgba(28, 28, 30, 0.98);
+    }
   }
   
-  /* 头部优化 - 响应式布局 */
+  /* 头部优化 - 参照搜索模态框设计 */
   .modal-header {
-    border-bottom: 0.5px solid rgba(0, 0, 0, 0.04);
-    padding: 0.75rem 1rem;
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+    padding: 16px 20px;
     border-radius: 16px 16px 0 0;
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     min-height: auto;
-  }
-  
-  /* 桌面端横向排列 */
-  @media (min-width: 769px) {
-    .modal-header {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-    }
     
-    .header-left {
-      flex: 1;
-    }
-    
-    .header-right {
-      flex-shrink: 0;
+    :global(.dark-theme) & {
+      border-bottom-color: rgba(255, 255, 255, 0.1);
     }
   }
   
@@ -895,22 +918,16 @@ export default {
     align-items: center;
   }
   
-  /* 移动端全宽 */
-  @media (max-width: 768px) {
-    .header-left,
-    .header-right {
-      width: 100%;
-    }
-  }
-  
   .header-left {
+    flex: 1;
     justify-content: flex-start;
+    min-width: 0;  /* 允许内容收缩 */
   }
   
   .header-right {
+    flex-shrink: 0;
     justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 4px;
+    gap: 6px;
   }
   
   /* 日期选择器 */
@@ -952,27 +969,6 @@ export default {
     height: 20px;
     background: rgba(0, 0, 0, 0.1);
     margin: 0 4px;
-  }
-  
-  /* 头部图标按钮 */
-  .header-menu-icons {
-    font-size: 1.125rem;
-    padding: 6px;
-    min-width: 32px;
-    min-height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    transition: background-color 0.2s;
-    
-    &:active {
-      background-color: rgba(0, 0, 0, 0.06);
-    }
-  }
-  
-  .close-modal {
-    font-size: 1.5rem;
   }
   
   .modal-title {
