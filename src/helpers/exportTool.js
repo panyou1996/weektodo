@@ -73,12 +73,21 @@ export default {
    */
   async uploadToCloud() {
     try {
+      // 检查是否设置了密钥
+      if (!supabaseRepository.hasSyncKey()) {
+        const key = prompt('请输入同步密钥（用于跨设备同步）：');
+        if (!key || key.trim().length < 3) {
+          return { success: false, message: '密钥至少 3 个字符' };
+        }
+        supabaseRepository.getSyncKey(key.trim());
+      }
+      
       const data = await this.exportToJson();
       const jsonString = JSON.stringify(data);
       
       const result = await supabaseRepository.uploadBackup(jsonString);
       
-      return { success: true, message: '上传成功', data: result };
+      return { success: true, message: '上传成功' };
     } catch (error) {
       console.error('Upload to cloud failed:', error);
       return { success: false, message: error.message };
@@ -90,6 +99,15 @@ export default {
    */
   async downloadFromCloud() {
     try {
+      // 检查是否设置了密钥
+      if (!supabaseRepository.hasSyncKey()) {
+        const key = prompt('请输入同步密钥（与上传时设置的相同）：');
+        if (!key || key.trim().length < 3) {
+          return { success: false, message: '密钥至少 3 个字符' };
+        }
+        supabaseRepository.getSyncKey(key.trim());
+      }
+      
       const jsonString = await supabaseRepository.downloadLatestBackup();
       const data = JSON.parse(jsonString);
       
@@ -100,7 +118,8 @@ export default {
       importData(data);
       migrations.migrate();
       
-      return { success: true, message: '下载成功' };
+      // 不自动刷新，由用户决定
+      return { success: true, message: '下载成功，页面将刷新', shouldReload: true };
     } catch (error) {
       console.error('Download from cloud failed:', error);
       return { success: false, message: error.message };

@@ -6,25 +6,38 @@ const supabaseKey = process.env.VUE_APP_SUPABASE_ANON_KEY || 'sb_publishable_rcT
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
+// 设备密钥管理
+const STORAGE_KEY = 'weektodo_sync_key'
+
 export default {
   /**
-   * 获取或创建匿名用户
+   * 获取或设置设备密钥
+   * @param {string} key - 自定义密钥（可选）
+   * @returns {string|null} 密钥
    */
-  async getOrCreateAnonymousUser() {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) {
-        const { data } = await supabase.auth.signInAnonymously()
-        if (!data) throw new Error('Failed to sign in anonymously')
-        return data.user
-      }
-      
-      return user
-    } catch (error) {
-      console.error('Get or create user error:', error)
-      throw error
+  getSyncKey(key = null) {
+    if (key) {
+      // 设置新密钥
+      localStorage.setItem(STORAGE_KEY, key)
+      return key
     }
+    
+    // 获取现有密钥
+    return localStorage.getItem(STORAGE_KEY)
+  },
+
+  /**
+   * 检查是否已设置密钥
+   */
+  hasSyncKey() {
+    return !!this.getSyncKey()
+  },
+
+  /**
+   * 清除密钥
+   */
+  clearSyncKey() {
+    localStorage.removeItem(STORAGE_KEY)
   },
 
   /**
@@ -35,8 +48,12 @@ export default {
    */
   async uploadBackup(fileContent, fileName = 'latest.wtdb') {
     try {
-      const user = await this.getOrCreateAnonymousUser()
-      const filePath = `${user.id}/${fileName}`
+      const syncKey = this.getSyncKey()
+      if (!syncKey) {
+        throw new Error('请先设置同步密钥')
+      }
+      
+      const filePath = `${syncKey}/${fileName}`
       
       // 将字符串转换为 Blob
       const blob = new Blob([fileContent], { type: 'application/json' })
@@ -45,14 +62,14 @@ export default {
         .from('backups')
         .upload(filePath, blob, {
           contentType: 'application/json',
-          upsert: true
+          upsert: true  // 覆盖现有文件
         })
       
       if (error) throw error
       
       // 同时保存带时间戳的备份
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-      const timestampPath = `${user.id}/backup_${timestamp}.wtdb`
+      const timestampPath = `${syncKey}/backup_${timestamp}.wtdb`
       await supabase.storage
         .from('backups')
         .upload(timestampPath, blob, {
@@ -72,8 +89,12 @@ export default {
    */
   async downloadLatestBackup() {
     try {
-      const user = await this.getOrCreateAnonymousUser()
-      const filePath = `${user.id}/latest.wtdb`
+      const syncKey = this.getSyncKey()
+      if (!syncKey) {
+        throw new Error('请先设置同步密钥')
+      }
+      
+      const filePath = `${syncKey}/latest.wtdb`
       
       const { data, error } = await supabase.storage
         .from('backups')
@@ -94,11 +115,14 @@ export default {
    */
   async listBackups() {
     try {
-      const user = await this.getOrCreateAnonymousUser()
+      const syncKey = this.getSyncKey()
+      if (!syncKey) {
+        throw new Error('请先设置同步密钥')
+      }
       
       const { data, error } = await supabase.storage
         .from('backups')
-        .list(user.id)
+        .list(syncKey)
       
       if (error) throw error
       
@@ -118,8 +142,12 @@ export default {
    */
   async deleteBackup(fileName) {
     try {
-      const user = await this.getOrCreateAnonymousUser()
-      const filePath = `${user.id}/${fileName}`
+      const syncKey = this.getSyncKey()
+      if (!syncKey) {
+        throw new Error('请先设置同步密钥')
+      }
+      
+      const filePath = `${syncKey}/${fileName}`
       
       const { error } = await supabase.storage
         .from('backups')
@@ -140,11 +168,14 @@ export default {
    */
   async getSyncStatus() {
     try {
-      const user = await this.getOrCreateAnonymousUser()
+      const syncKey = this.getSyncKey()
+      if (!syncKey) {
+        return { exists: false, needSetup: true }
+      }
       
       const { data, error } = await supabase.storage
         .from('backups')
-        .list(user.id, {
+        .list(syncKey, {
           limit: 100,
           search: 'latest.wtdb'
         })

@@ -521,10 +521,13 @@ export default {
       try {
         const result = await exportTool.downloadFromCloud();
         if (result.success) {
-          alert(this.$t("settings.downloadSuccess") || "下载成功，应用将重新加载");
-          setTimeout(() => {
-            location.reload();
-          }, 1000);
+          if (result.shouldReload) {
+            if (confirm(this.$t("settings.downloadSuccess") || "下载成功，是否刷新页面？")) {
+              location.reload();
+            }
+          } else {
+            alert(this.$t("settings.downloadSuccess") || "下载成功");
+          }
         } else {
           alert(this.$t("settings.downloadError") || "下载失败: " + result.message);
         }
