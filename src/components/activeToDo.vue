@@ -177,7 +177,7 @@ export default {
   background-color: #ffffff;
   color: #1e1e1e;
   border-radius: 7px;
-  position: fixed;  /* 使用 fixed 定位 */
+  position: absolute;  /* 使用 absolute 定位，相对于 document */
   box-shadow: 0px 2px 13px 0px rgba(0, 0, 0, 0.15);
   z-index: 6;
   display: none;

@@ -100,11 +100,13 @@ export default {
       const activeTodoItem = document.getElementById("todo-item-active");
       this.$nextTick(function () {
         const bounding = this.$refs.itemContainer.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
         
-        // 使用 fixed 定位，直接使用 getBoundingClientRect 的值
+        // 使用 absolute 定位，计算相对于 document 的绝对位置
         activeTodoItem.style.width = `${bounding.width}px`;
-        activeTodoItem.style.top = `${bounding.top}px`;
-        activeTodoItem.style.left = `${bounding.left}px`;
+        activeTodoItem.style.top = `${bounding.top + scrollTop}px`;
+        activeTodoItem.style.left = `${bounding.left + scrollLeft}px`;
         activeTodoItem.style.display = `block`;
         
         // 检查是否超出视口底部
@@ -115,7 +117,7 @@ export default {
         if (itemBottom > viewportHeight - margin_bottom) {
           // 向上调整位置
           const offset = itemBottom - (viewportHeight - margin_bottom);
-          activeTodoItem.style.top = `${bounding.top - offset}px`;
+          activeTodoItem.style.top = `${bounding.top + scrollTop - offset}px`;
         }
       });
     },
