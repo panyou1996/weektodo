@@ -98,23 +98,25 @@ export default {
 </script>
 
 <style scoped lang="scss">
+/* 默认桌面端隐藏 */
 .bottom-nav {
-  display: none; /* 默认隐藏 */
+  display: none;
 }
 
 /* 移动端显示底部导航 */
 @media (max-width: 768px) {
   .bottom-nav {
-    display: flex;
+    display: flex !important;  /* 强制显示 */
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
+    width: 100%;
     height: 60px;
     background-color: #ffffff;
     border-top: 1px solid #e0e0e0;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    z-index: 1000;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1050;  /* 高于大部分元素，但低于模态框 */
     padding-bottom: env(safe-area-inset-bottom); /* iOS 安全区域 */
   }
   
