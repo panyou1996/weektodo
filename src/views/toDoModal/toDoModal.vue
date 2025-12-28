@@ -3,17 +3,17 @@
     tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header d-flex">
-          <div class="todo-list-selector">
-            <div class="d-flex align-items-center">
-              <div v-show="showingCalendar" class="align-items-center date-picker-btn" @click="showCalendar()">
-                <i class="bi-calendar-event mx-2"></i>
-                <datepicker id="todo-date-picker-input" class="py-2" v-model="pickedDate" :locale="language"
+        <div class="modal-header">
+          <div class="header-left">
+            <div class="todo-list-selector">
+              <div v-show="showingCalendar" class="date-picker-btn" @click="showCalendar()">
+                <i class="bi-calendar-event"></i>
+                <datepicker id="todo-date-picker-input" v-model="pickedDate" :locale="language"
                   :input-format='"dd/MM/yyyy"' :weekStartsOn="weekStartOnMonday" />
               </div>
-              <div v-show="!showingCalendar" class="align-items-center date-picker-btn">
-                <div class="align-items-center date-picker-btn py-2" id="customListDropDown" data-bs-toggle="dropdown">
-                  <i class="bi-view-list mx-2"></i>
+              <div v-show="!showingCalendar" class="date-picker-btn">
+                <div class="date-picker-btn" id="customListDropDown" data-bs-toggle="dropdown">
+                  <i class="bi-view-list"></i>
                   <div id="todo-list-select">{{ pickedCListName }}</div>
                 </div>
                 <ul class="dropdown-menu" aria-labelledby="customListDropDown">
@@ -27,9 +27,9 @@
                   </li>
                 </ul>
               </div>
-              <div v-if="showCL && showCal" class="d-flex align-items-center">
+              <div v-if="showCL && showCal" class="selector-divider-container">
                 <div class="selector-divider"></div>
-                <i id="btnGroupDrop1" class="bi-chevron-down p-2" type="button" data-bs-toggle="dropdown"></i>
+                <i id="btnGroupDrop1" class="bi-chevron-down" type="button" data-bs-toggle="dropdown"></i>
                 <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
                   <li>
                     <button class="dropdown-item" type="button" @click="showingCalendar = true">
@@ -47,7 +47,8 @@
               </div>
             </div>
           </div>
-          <div class="d-flex ms-auto align-items-center">
+          
+          <div class="header-right">
             <time-picker :time="todo.time" @time-selected="changeTime"></time-picker>
             <i :class="{ 'bi-bell': !todo.alarm, 'bi-bell-fill': todo.alarm }" class="header-menu-icons"
               @click="changeAlarm" :title="$t('todoDetails.alarm')"></i>
@@ -83,10 +84,8 @@
                 </button>
               </li>
             </ul>
-            <div>
-              <i class="bi-x close-modal header-menu-icons" ref="closeModal" data-bs-dismiss="modal"
-                :title="$t('todoDetails.close')"></i>
-            </div>
+            <i class="bi-x close-modal header-menu-icons" ref="closeModal" data-bs-dismiss="modal"
+              :title="$t('todoDetails.close')"></i>
           </div>
         </div>
         <div class="modal-body">
@@ -861,33 +860,123 @@ export default {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   }
   
+  /* 头部优化 - 响应式布局 */
   .modal-header {
     border-bottom: 0.5px solid rgba(0, 0, 0, 0.04);
-    padding: 1rem 1.25rem;
+    padding: 0.75rem 1rem;
     border-radius: 16px 16px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: auto;
+  }
+  
+  .header-left,
+  .header-right {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .header-left {
+    justify-content: flex-start;
+  }
+  
+  .header-right {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  /* 日期选择器 */
+  .todo-list-selector {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+  }
+  
+  .date-picker-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.03);
+    
+    i {
+      font-size: 1rem;
+    }
+  }
+  
+  #todo-list-select {
+    font-size: 0.875rem;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .selector-divider-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .selector-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 0 4px;
+  }
+  
+  /* 头部图标按钮 */
+  .header-menu-icons {
+    font-size: 1.125rem;
+    padding: 6px;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    
+    &:active {
+      background-color: rgba(0, 0, 0, 0.06);
+    }
+  }
+  
+  .close-modal {
+    font-size: 1.5rem;
   }
   
   .modal-title {
-    font-size: 1.125rem;
+    font-size: 1rem;
     font-weight: 600;
     letter-spacing: -0.02em;
   }
   
   .modal-body {
-    padding: 1.25rem;
+    padding: 1rem;
     flex: 1;
     overflow-y: auto;
     padding-bottom: 2rem;
     -webkit-overflow-scrolling: touch;
   }
   
-  /* 标题输入框 */
+  /* 任务标题 - 字体优化 */
+  .todo-title {
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+  
   .todo-title-input {
-    font-size: 1.0625rem;
+    font-size: 1rem;
     border: none;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 0;
-    padding: 0.75rem 0;
+    padding: 0.5rem 0;
     
     &:focus {
       border-bottom-color: #007aff;
@@ -897,8 +986,8 @@ export default {
   
   /* 复选框优化 */
   input[type="checkbox"] {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     border-radius: 6px;
     border: 2px solid #c7c7cc;
     
@@ -910,8 +999,8 @@ export default {
   
   /* 按钮优化 - iOS 风格 */
   .btn {
-    min-height: 50px;
-    font-size: 1rem;
+    min-height: 44px;
+    font-size: 0.9375rem;
     font-weight: 600;
     border-radius: 12px;
     letter-spacing: -0.02em;
@@ -934,19 +1023,27 @@ export default {
   
   /* 子任务列表 */
   .subtask-item {
-    padding: 0.75rem 0;
-    min-height: 50px;
+    padding: 0.625rem 0;
+    min-height: 44px;
     border-bottom: 0.5px solid rgba(0, 0, 0, 0.04);
+    font-size: 0.9375rem;
     
     &:last-child {
       border-bottom: none;
     }
   }
   
+  /* 描述文字 */
+  .description-text,
+  textarea {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  
   /* 颜色选择器 */
   .color-picker-item {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 10px;
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     
@@ -960,8 +1057,8 @@ export default {
   .form-select {
     border-radius: 10px;
     border: 1px solid rgba(0, 0, 0, 0.06);
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9375rem;
     
     &:focus {
       border-color: #007aff;
