@@ -100,19 +100,23 @@ export default {
       const activeTodoItem = document.getElementById("todo-item-active");
       this.$nextTick(function () {
         const bounding = this.$refs.itemContainer.getBoundingClientRect();
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
         
-        // 考虑页面滚动位置
+        // 使用 fixed 定位，直接使用 getBoundingClientRect 的值
         activeTodoItem.style.width = `${bounding.width}px`;
-        activeTodoItem.style.top = `${bounding.top + scrollTop}px`;
-        activeTodoItem.style.left = `${bounding.left + scrollLeft}px`;
+        activeTodoItem.style.top = `${bounding.top}px`;
+        activeTodoItem.style.left = `${bounding.left}px`;
         activeTodoItem.style.display = `block`;
         
-        // 检查是否超出视口
+        // 检查是否超出视口底部
         const margin_bottom = 10;
-        var offset = parseInt(window.innerHeight) - (parseInt(bounding.y) + parseInt(activeTodoItem.offsetHeight)) - margin_bottom;
-        if (offset < 0) activeTodoItem.style.top = `${bounding.y + offset + scrollTop}px`;
+        const viewportHeight = window.innerHeight;
+        const itemBottom = bounding.top + activeTodoItem.offsetHeight;
+        
+        if (itemBottom > viewportHeight - margin_bottom) {
+          // 向上调整位置
+          const offset = itemBottom - (viewportHeight - margin_bottom);
+          activeTodoItem.style.top = `${bounding.top - offset}px`;
+        }
       });
     },
   },

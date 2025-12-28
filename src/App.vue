@@ -696,22 +696,28 @@ export default {
     },
     // 处理日期导航条选择
     handleDateSelected: function(dateId) {
+      const currentDate = this.selected_date;
+      
+      // 先更新选中日期
       this.selected_date = dateId;
+      
       this.$nextTick(() => {
-        // 计算目标日期在数组中的索引
-        const dateArray = this.dates_array;
-        const targetIndex = dateArray.indexOf(dateId);
+        // 计算日期差值，确定滚动方向
+        const current = moment(currentDate, "YYYYMMDD");
+        const target = moment(dateId, "YYYYMMDD");
+        const diffDays = target.diff(current, "days");
         
-        if (targetIndex !== -1) {
-          // 滚动到对应位置
-          const container = this.$refs.weekListContainer;
-          if (container) {
-            const scrollLeft = targetIndex * this.todoListWidth();
-            container.scrollTo({
-              left: scrollLeft,
-              behavior: "smooth"
-            });
-          }
+        const container = this.$refs.weekListContainer;
+        if (container) {
+          // 直接滚动到目标位置，不依赖数组索引
+          const currentScroll = container.scrollLeft;
+          const itemWidth = this.todoListWidth();
+          const targetScroll = currentScroll + (diffDays * itemWidth);
+          
+          container.scrollTo({
+            left: targetScroll,
+            behavior: "smooth"
+          });
         }
         
         // 聚焦输入框
