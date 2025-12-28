@@ -3,33 +3,44 @@
   <div v-show="compatible" id="app-container" class="app-container" :class="{ 'dark-theme': darkTheme }">
     <div class="app-body" :style="{ zoom: `${zoom}%` }">
       <splash-screen ref="splash"></splash-screen>
-      <side-bar @change-date="setSelectedDate"></side-bar>
+      
+      <!-- 移动端 Any.do 视图 -->
+      <any-do-view 
+        v-if="isMobile" 
+        class="mobile-anydo-view"
+        @task-click="openTask"
+        @toggle-sidebar="toggleMobileSidebar"
+      />
+      
+      <!-- 桌面端经典视图 -->
+      <template v-else>
+        <side-bar @change-date="setSelectedDate"></side-bar>
 
-      <div class="h-100 d-flex flex-column">
-        <div
-          v-show="showCalendar"
-          class="todo-lists-container"
-          :style="resizableStyle"
-          ref="calendarContainer"
-          :class="{
-            'full-screen': !showCustomList,
-            'hidden-lists-container': hideTopListContainer,
-            'full-screen-divider': hideBottomListContainer,
-          }"
-        >
-          <i class="bi-chevron-left slider-btn" ref="weekLeft" @click="weekMoveLeft"></i>
-          <div class="todo-slider weekdays" ref="weekListContainer">
-            <to-do-list
-              v-for="date in dates_array"
-              :key="date"
-              :id="date"
-              :showCustomList="showCustomList"
-              @todo-list-mounted="todoListMounted"
-            >
-            </to-do-list>
+        <div class="h-100 d-flex flex-column">
+          <div
+            v-show="showCalendar"
+            class="todo-lists-container"
+            :style="resizableStyle"
+            ref="calendarContainer"
+            :class="{
+              'full-screen': !showCustomList,
+              'hidden-lists-container': hideTopListContainer,
+              'full-screen-divider': hideBottomListContainer,
+            }"
+          >
+            <i class="bi-chevron-left slider-btn" ref="weekLeft" @click="weekMoveLeft"></i>
+            <div class="todo-slider weekdays" ref="weekListContainer">
+              <to-do-list
+                v-for="date in dates_array"
+                :key="date"
+                :id="date"
+                :showCustomList="showCustomList"
+                @todo-list-mounted="todoListMounted"
+              >
+              </to-do-list>
+            </div>
+            <i class="bi-chevron-right slider-btn" ref="weekRight" @click="weekMoveRight"></i>
           </div>
-          <i class="bi-chevron-right slider-btn" ref="weekRight" @click="weekMoveRight"></i>
-        </div>
 
         <div
           v-show="showCustomList && showCalendar"
@@ -105,6 +116,7 @@
           <img v-else src="img/WeekToDoLightLogo.webp" />
         </div>
       </div>
+      </template>
 
       <remove-custom-list></remove-custom-list>
       <config-modal @change-columns="weekResetScroll" :configProp="$store.getters.config"></config-modal>
@@ -123,10 +135,10 @@
       <reorder-custom-lists-modal @reset-custom-list="resetCustomList"></reorder-custom-lists-modal>
     </div>
     
-    <!-- 移动端底部导航栏 -->
-    <bottom-nav @change-date="setSelectedDate"></bottom-nav>
+    <!-- 移动端底部导航栏（仅经典视图） -->
+    <bottom-nav v-if="!isMobile" @change-date="setSelectedDate"></bottom-nav>
     
-    <!-- 移动端快速添加浮动按钮 -->
+    <!-- 移动端快速添加浮动按钮（仅经典视图） -->
     <fab-button @change-date="setSelectedDate"></fab-button>
     
     <!-- 搜索模态框 -->
@@ -161,6 +173,7 @@ import toDoList from "./components/toDoList";
 import moment from "moment";
 import sideBar from "./components/layout/sideBar";
 import bottomNav from "./components/layout/bottomNav";
+import AnyDoView from "./components/AnyDoView.vue";
 import customToDoListIdsRepository from "./repositories/customToDoListIdsRepository";
 import removeCustomList from "./components/comfirmModals/removeCustomList";
 import configModal from "./views/configModal";
@@ -198,6 +211,7 @@ export default {
     toDoList,
     sideBar,
     bottomNav,
+    AnyDoView,
     removeCustomList,
     splashScreen,
     aboutModal,
@@ -264,7 +278,11 @@ export default {
     );
   },
   mounted() {
-    this.$refs.weekListContainer.scrollLeft = this.todoListWidth();
+    // 仅在桌面端初始化经典视图
+    if (!this.isMobile && this.$refs.weekListContainer) {
+      this.$refs.weekListContainer.scrollLeft = this.todoListWidth();
+    }
+    
     this.calendarHeight = this.$store.getters.config.calendarHeight;
     window.addEventListener("resize", this.weekResetScroll);
     
@@ -275,7 +293,9 @@ export default {
     // this.initScrollListener();
     
     // 监听列表滑动，同步导航条
-    this.initSwipeListener();
+    if (!this.isMobile) {
+      this.initSwipeListener();
+    }
     
     // 监听滑动和点击，隐藏悬浮窗口
     this.initActiveToDoHideListener();
@@ -331,7 +351,9 @@ export default {
       }
     },
     weekResetScroll: function () {
-      this.$refs.weekListContainer.scrollLeft = this.todoListWidth();
+      if (this.$refs.weekListContainer) {
+        this.$refs.weekListContainer.scrollLeft = this.todoListWidth();
+      }
     },
     customMoveRight: function () {
       this.$refs.customListContainer.scrollLeft =
@@ -368,6 +390,16 @@ export default {
           }
         }, 100);
       }.bind(this));
+    },
+    openTask: function (taskData) {
+      // Any.do 视图中打开任务详情
+      this.$store.commit("selectedTodo", taskData);
+      let modal = new Modal(document.getElementById("toDoModal"));
+      modal.show();
+    },
+    toggleMobileSidebar: function () {
+      // 移动端切换侧边栏（可以后续实现）
+      console.log("Toggle sidebar");
     },
     isElectron: function () {
       let isElectron = require("is-electron");
@@ -764,6 +796,9 @@ export default {
     },
   },
   computed: {
+    isMobile: function () {
+      return window.innerWidth <= 768;
+    },
     dates_array: function () {
       if (!this.selected_date) return [];
       var dates_array = [moment(this.selected_date).subtract(1, "d").format("YYYYMMDD"), this.selected_date];
@@ -1073,9 +1108,21 @@ body {
 
 /* 移动端全局适配 */
 @media (max-width: 768px) {
+  /* Any.do 视图样式 */
+  .mobile-anydo-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    overflow: hidden;
+  }
+  
+  /* 隐藏经典视图组件 */
   .app-body {
     overflow-x: auto;
-    padding-bottom: 70px;  /* 为底部导航栏预留空间 */
+    padding-bottom: 0;  /* Any.do 视图自带底部输入栏 */
     touch-action: pan-x pan-y;  /* 允许双指缩放，但保持滚动 */
   }
   
