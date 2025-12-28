@@ -5,9 +5,14 @@
     <div style="flex-grow: 1" class="noselect">
       <div v-if="!customTodoList">
         <h4 :class="{ 'today-date': is_today }">
-          {{ moments(id).locale(language).format("dddd") }}
+          <span class="mobile-date-format">
+            {{ moments(id).locale(language).format('D日 (ddd)') }}
+          </span>
+          <span class="desktop-date-format">
+            {{ moments(id).locale(language).format("dddd") }}
+          </span>
         </h4>
-        <span class="weekly-to-do-subheader">
+        <span class="weekly-to-do-subheader desktop-date-format">
           {{ moments(id).locale(language).format("LL") }}
         </span>
       </div>
@@ -227,15 +232,23 @@ export default {
 
 /* 移动端适配 */
 @media (max-width: 768px) {
+  .mobile-date-format {
+    display: inline;
+  }
+  
+  .desktop-date-format {
+    display: none;
+  }
+  
   .weekly-to-do-header {
-    margin-bottom: 15px;
-    margin-top: 8px;
+    margin-bottom: 12px;
+    margin-top: 6px;
   }
   
   .weekly-to-do-header h4 {
-    font-size: 16px;
-    min-height: 20px;
-    margin-bottom: 2px;
+    font-size: 15px;
+    min-height: 18px;
+    margin-bottom: 0;
   }
   
   .weekly-to-do-subheader {
@@ -243,9 +256,20 @@ export default {
   }
   
   .header-menu-icons {
-    font-size: 16px !important;
+    font-size: 18px !important;
     visibility: visible !important;
     opacity: 1 !important;
+  }
+}
+
+/* 桌面端隐藏移动端格式 */
+@media (min-width: 769px) {
+  .mobile-date-format {
+    display: none;
+  }
+  
+  .desktop-date-format {
+    display: inline;
   }
 }
 

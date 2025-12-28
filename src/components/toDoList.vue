@@ -215,14 +215,15 @@ export default {
 /* 移动端适配 */
 @media (max-width: 768px) {
   .to-do-list-container {
-    padding-left: 6px;
-    padding-right: 6px;
-    min-width: 140px;
+    padding-left: 8px;
+    padding-right: 8px;
+    min-width: 100%;  /* 移动端单列全屏显示 */
+    flex: 0 0 100% !important;  /* 强制占满全屏 */
   }
   
   .todo-input {
-    font-size: 0.75rem;
-    padding: 0 4px;
+    font-size: 0.875rem;
+    padding: 0 6px;
   }
   
   .weekly-to-do-header h4 {

@@ -122,6 +122,9 @@
 
       <reorder-custom-lists-modal @reset-custom-list="resetCustomList"></reorder-custom-lists-modal>
     </div>
+    
+    <!-- 移动端底部导航栏 -->
+    <bottom-nav @change-date="setSelectedDate"></bottom-nav>
 
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1056">
       <toast-message
@@ -151,6 +154,7 @@
 import toDoList from "./components/toDoList";
 import moment from "moment";
 import sideBar from "./components/layout/sideBar";
+import bottomNav from "./components/layout/bottomNav";
 import customToDoListIdsRepository from "./repositories/customToDoListIdsRepository";
 import removeCustomList from "./components/comfirmModals/removeCustomList";
 import configModal from "./views/configModal";
@@ -185,6 +189,7 @@ export default {
     configModal,
     toDoList,
     sideBar,
+    bottomNav,
     removeCustomList,
     splashScreen,
     aboutModal,
@@ -859,22 +864,37 @@ body {
 @media (max-width: 768px) {
   .app-body {
     overflow-x: auto;
+    padding-bottom: 70px;  /* 为底部导航栏预留空间 */
   }
   
   .todo-lists-container {
-    margin-top: 10px;
-    margin-bottom: 15px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .todo-slider {
+    scroll-snap-type: x mandatory;  /* 启用吸附滚动 */
+    scroll-behavior: smooth;         /* 平滑滚动 */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* iOS 滚动优化 */
+  }
+  
+  .to-do-list-container {
+    scroll-snap-align: start;  /* 吸附到左侧 */
   }
   
   .slider-btn {
-    font-size: 1.5rem;
-    margin-left: 2px;
-    margin-right: 2px;
-    padding: 2px;
+    font-size: 1.8rem;
+    margin-left: 4px;
+    margin-right: 4px;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
   
   .main-horizontal-divider {
-    min-height: 3px;
+    display: none;  /* 移动端隐藏分隔条 */
   }
   
   .divider-icons {
@@ -884,6 +904,11 @@ body {
   /* 隐藏 zoom 功能，移动端不适用 */
   .app-body {
     zoom: 100% !important;
+  }
+  
+  /* 移动端隐藏自定义列表区域，专注日历视图 */
+  .todo-lists-container:not(.weekdays) {
+    display: none;
   }
 }
 </style>

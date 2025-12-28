@@ -193,21 +193,7 @@ export default {
 /* 移动端适配 */
 @media (max-width: 768px) {
   .side-bar {
-    width: 3rem;
-    
-    > i,
-    .sidebar-icon {
-      font-size: 1.1rem;
-      padding: 8px;
-      margin-bottom: 6px;
-    }
-    
-    .logo {
-      width: 32px;
-      height: 32px;
-      margin-bottom: 4px;
-      margin-top: 6px;
-    }
+    display: none;  /* 移动端隐藏侧边栏，使用底部导航 */
   }
 }
 

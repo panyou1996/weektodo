@@ -160,20 +160,32 @@ export default {
 /* 移动端适配 */
 @media (max-width: 768px) {
   .item-text {
-    font-size: 0.75rem;
-    padding: 0 2px 0 4px;
-    line-height: 1.2rem;
-    min-height: 1.1rem;
+    font-size: 0.875rem;  /* 增大字体 */
+    padding: 0 4px 0 6px;
+    line-height: 1.5rem;   /* 增加行高 */
+    min-height: 1.4rem;
+    white-space: normal;   /* 允许换行 */
+    word-break: break-word; /* 支持换行 */
+  }
+  
+  .item-text.compact-view {
+    white-space: nowrap;   /* 紧凑模式保持单行 */
   }
   
   .item-time {
-    font-size: 0.7rem;
-    padding: 0 1px;
+    font-size: 0.75rem;
+    padding: 0 2px;
   }
   
   input[type="checkbox"] {
-    width: 14px;
-    height: 14px;
+    width: 20px;   /* 增大复选框 */
+    height: 20px;
+    margin-right: 6px;
+  }
+  
+  .todo-item-container {
+    min-height: 40px;  /* 增加最小高度，方便点击 */
+    padding: 4px 0;
   }
 }
 
