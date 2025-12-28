@@ -848,17 +848,22 @@ export default {
 @media (max-width: 768px) {
   .modal-dialog {
     max-width: 95vw;
+    max-height: calc(100vh - 80px);  /* 预留底部导航栏空间 */
     margin: 0.5rem;
   }
   
   .modal-content {
-    max-height: 90vh;
+    max-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
   }
   
   .modal-body {
     padding: 1rem;
-    max-height: calc(90vh - 120px);
+    flex: 1;
     overflow-y: auto;
+    padding-bottom: 2rem;  /* 额外留出底部空间 */
+    -webkit-overflow-scrolling: touch;
   }
   
   /* 标题输入框 */

@@ -645,17 +645,22 @@ export default {
 @media (max-width: 768px) {
   .modal-dialog {
     max-width: 95vw;
-    max-height: 85vh;
+    max-height: calc(100vh - 80px);  /* 预留底部导航栏空间 */
     margin: 1rem auto;
   }
   
   .modal-content {
-    height: 85vh;
+    height: calc(100vh - 80px);  /* 预留底部导航栏空间 */
+    display: flex;
+    flex-direction: column;
   }
   
   .modal-body {
     flex-direction: column !important;
     padding: 0 !important;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
   }
   
   /* 左侧菜单满宽 */
@@ -663,15 +668,18 @@ export default {
     width: 100% !important;
     max-width: none !important;
     border-bottom: 1px solid #dee2e6;
+    flex-shrink: 0;  /* 不压缩 */
   }
   
   /* 右侧内容区域 */
   .tab-content {
     width: 100% !important;
     height: auto !important;
-    max-height: calc(85vh - 200px);
+    flex: 1;
     overflow-y: auto;
     padding: 1rem !important;
+    padding-bottom: 2rem !important;  /* 额外留出底部空间 */
+    -webkit-overflow-scrolling: touch;  /* iOS 滚动优化 */
   }
   
   /* 开关按钮优化 */
@@ -689,6 +697,7 @@ export default {
   .data-buttons button {
     min-height: 48px;
     font-size: 0.85rem;
+    margin-bottom: 0.5rem;  /* 增加间距 */
   }
   
   /* 输入框优化 */

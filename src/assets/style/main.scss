@@ -427,6 +427,8 @@ i {
   .dropdown-menu {
     min-width: 200px;
     font-size: 0.9rem;
+    max-height: calc(100vh - 150px);  /* 限制最大高度 */
+    overflow-y: auto;
   }
   
   .dropdown-item {
@@ -447,8 +449,14 @@ i {
     padding-right: 0 !important;
   }
   
+  .modal-dialog {
+    margin: 1rem !important;
+    max-width: calc(100vw - 2rem) !important;
+  }
+  
   .modal-header {
     padding: 1rem;
+    flex-shrink: 0;  /* 不压缩 */
   }
   
   .modal-title {
@@ -483,5 +491,14 @@ i {
   .form-switch .form-check-input {
     width: 3rem;
     height: 1.5rem;
+  }
+  
+  /* 防止模态框被底部导航栏遮挡 */
+  .modal.show {
+    padding-bottom: 0 !important;
+  }
+  
+  .modal-backdrop {
+    z-index: 1040 !important;  /* 低于底部导航栏（1050） */
   }
 }
