@@ -126,6 +126,13 @@
     <!-- 移动端底部导航栏 -->
     <bottom-nav @change-date="setSelectedDate"></bottom-nav>
     
+    <!-- 移动端日期/列表导航条 -->
+    <date-navigator 
+      :current-date="selected_date"
+      @date-selected="handleDateSelected"
+      @list-selected="handleListSelected"
+    ></date-navigator>
+    
     <!-- 移动端快速添加浮动按钮 -->
     <fab-button @change-date="setSelectedDate"></fab-button>
     
@@ -161,6 +168,7 @@ import toDoList from "./components/toDoList";
 import moment from "moment";
 import sideBar from "./components/layout/sideBar";
 import bottomNav from "./components/layout/bottomNav";
+import dateNavigator from "./components/layout/dateNavigator";
 import customToDoListIdsRepository from "./repositories/customToDoListIdsRepository";
 import removeCustomList from "./components/comfirmModals/removeCustomList";
 import configModal from "./views/configModal";
@@ -198,6 +206,7 @@ export default {
     toDoList,
     sideBar,
     bottomNav,
+    dateNavigator,
     removeCustomList,
     splashScreen,
     aboutModal,
@@ -268,8 +277,8 @@ export default {
     // 添加双指缩放事件监听
     this.initPinchZoom();
     
-    // 添加滚动监听实现底部导航栏自动隐藏
-    this.initScrollListener();
+    // 添加滚动监听实现底部导航栏自动隐藏（已禁用）
+    // this.initScrollListener();
     
     document.onreadystatechange = () => {
       if (document.readyState == "complete") {
@@ -676,6 +685,33 @@ export default {
       
       this.lastScrollTop = scrollTop;
     },
+    // 处理日期导航条选择
+    handleDateSelected: function(dateId) {
+      this.selected_date = dateId;
+      this.$nextTick(() => {
+        this.weekResetScroll();
+        const listElement = document.getElementById("list" + dateId);
+        if (listElement) {
+          const input = listElement.querySelector(".new-todo-input");
+          if (input) {
+            input.focus();
+          }
+        }
+      });
+    },
+    handleListSelected: function(listId) {
+      // 切换到自定义列表
+      this.$nextTick(() => {
+        const listElement = document.getElementById("list" + listId);
+        if (listElement) {
+          listElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          const input = listElement.querySelector(".new-todo-input");
+          if (input) {
+            input.focus();
+          }
+        }
+      });
+    },
   },
   computed: {
     dates_array: function () {
@@ -989,7 +1025,7 @@ body {
 @media (max-width: 768px) {
   .app-body {
     overflow-x: auto;
-    padding-bottom: 70px;  /* 为底部导航栏预留空间 */
+    padding-bottom: 120px;  /* 为底部导航栏和日期导航条预留空间 (50px + 60px + 10px) */
     touch-action: pan-x pan-y;  /* 允许双指缩放，但保持滚动 */
   }
   

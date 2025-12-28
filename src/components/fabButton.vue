@@ -126,7 +126,7 @@ export default {
     display: block;
     position: fixed;
     right: 20px;
-    bottom: 80px;
+    bottom: 130px;  /* 调整位置，避免被日期导航条遮挡 (50px + 60px + 20px) */
     z-index: 1040;
   }
   
