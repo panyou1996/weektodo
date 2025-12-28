@@ -843,4 +843,51 @@ export default {
 .completed-task {
   text-decoration: line-through;
 }
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .modal-dialog {
+    max-width: 95vw;
+    margin: 0.5rem;
+  }
+  
+  .modal-content {
+    max-height: 90vh;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+    max-height: calc(90vh - 120px);
+    overflow-y: auto;
+  }
+  
+  /* 标题输入框 */
+  .todo-title-input {
+    font-size: 1rem;
+  }
+  
+  /* 复选框优化 */
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* 按钮优化 */
+  .btn {
+    min-height: 44px;
+    font-size: 0.9rem;
+  }
+  
+  /* 子任务列表 */
+  .subtask-item {
+    padding: 0.5rem;
+    min-height: 44px;
+  }
+  
+  /* 颜色选择器 */
+  .color-picker-item {
+    width: 36px;
+    height: 36px;
+  }
+}
 </style>

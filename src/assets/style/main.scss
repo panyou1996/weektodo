@@ -420,3 +420,68 @@ i {
     display: none !important;
   }
 }
+
+/* 移动端下拉菜单优化 */
+@media (max-width: 768px) {
+  /* 下拉菜单 */
+  .dropdown-menu {
+    min-width: 200px;
+    font-size: 0.9rem;
+  }
+  
+  .dropdown-item {
+    padding: 0.75rem 1rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .dropdown-item i {
+    font-size: 1.1rem;
+    margin-right: 8px;
+  }
+  
+  /* 模态框通用优化 */
+  .modal {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  .modal-header {
+    padding: 1rem;
+  }
+  
+  .modal-title {
+    font-size: 1.1rem;
+  }
+  
+  .close-modal,
+  .bi-x {
+    font-size: 1.5rem;
+    padding: 0.5rem;
+  }
+  
+  /* 表单元素优化 */
+  .form-control,
+  .form-select {
+    font-size: 1rem;
+    min-height: 44px;
+  }
+  
+  textarea.form-control {
+    min-height: 100px;
+  }
+  
+  /* 按钮优化 */
+  .btn {
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  /* 开关按钮 */
+  .form-switch .form-check-input {
+    width: 3rem;
+    height: 1.5rem;
+  }
+}

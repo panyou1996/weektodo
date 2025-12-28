@@ -637,4 +637,61 @@ export default {
     display: none;
   }
 }
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .modal-dialog {
+    max-width: 95vw;
+    max-height: 85vh;
+    margin: 1rem auto;
+  }
+  
+  .modal-content {
+    height: 85vh;
+  }
+  
+  .modal-body {
+    flex-direction: column !important;
+    padding: 0 !important;
+  }
+  
+  /* 左侧菜单满宽 */
+  #config-links-menu {
+    width: 100% !important;
+    max-width: none !important;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  /* 右侧内容区域 */
+  .tab-content {
+    width: 100% !important;
+    height: auto !important;
+    max-height: calc(85vh - 200px);
+    overflow-y: auto;
+    padding: 1rem !important;
+  }
+  
+  /* 开关按钮优化 */
+  .form-check-input {
+    width: 3rem;
+    height: 1.5rem;
+  }
+  
+  /* 按钮文字优化 */
+  .form-check-label {
+    font-size: 0.9rem;
+  }
+  
+  /* 按钮高度优化 */
+  .data-buttons button {
+    min-height: 48px;
+    font-size: 0.85rem;
+  }
+  
+  /* 输入框优化 */
+  .form-select,
+  .form-range {
+    min-height: 40px;
+  }
+}
 </style>
