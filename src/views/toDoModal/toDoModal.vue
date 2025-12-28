@@ -844,11 +844,11 @@ export default {
   text-decoration: line-through;
 }
 
-/* 移动端适配 */
+/* 移动端适配 - iOS 16 风格 */
 @media (max-width: 768px) {
   .modal-dialog {
     max-width: 95vw;
-    max-height: calc(100vh - 80px);  /* 预留底部导航栏空间 */
+    max-height: calc(100vh - 80px);
     margin: 0.5rem;
   }
   
@@ -856,43 +856,117 @@ export default {
     max-height: calc(100vh - 80px);
     display: flex;
     flex-direction: column;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  }
+  
+  .modal-header {
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.04);
+    padding: 1rem 1.25rem;
+    border-radius: 16px 16px 0 0;
+  }
+  
+  .modal-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
   }
   
   .modal-body {
-    padding: 1rem;
+    padding: 1.25rem;
     flex: 1;
     overflow-y: auto;
-    padding-bottom: 2rem;  /* 额外留出底部空间 */
+    padding-bottom: 2rem;
     -webkit-overflow-scrolling: touch;
   }
   
   /* 标题输入框 */
   .todo-title-input {
-    font-size: 1rem;
+    font-size: 1.0625rem;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 0;
+    padding: 0.75rem 0;
+    
+    &:focus {
+      border-bottom-color: #007aff;
+      box-shadow: none;
+    }
   }
   
   /* 复选框优化 */
   input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 2px solid #c7c7cc;
+    
+    &:checked {
+      background-color: #007aff;
+      border-color: #007aff;
+    }
   }
   
-  /* 按钮优化 */
+  /* 按钮优化 - iOS 风格 */
   .btn {
-    min-height: 44px;
-    font-size: 0.9rem;
+    min-height: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    letter-spacing: -0.02em;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+  
+  .btn-primary {
+    background-color: #007aff;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+    
+    &:hover {
+      background-color: #0051d5;
+    }
   }
   
   /* 子任务列表 */
   .subtask-item {
-    padding: 0.5rem;
-    min-height: 44px;
+    padding: 0.75rem 0;
+    min-height: 50px;
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.04);
+    
+    &:last-child {
+      border-bottom: none;
+    }
   }
   
   /* 颜色选择器 */
   .color-picker-item {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+  
+  /* 表单控件 */
+  .form-control,
+  .form-select {
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    
+    &:focus {
+      border-color: #007aff;
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
   }
 }
 </style>

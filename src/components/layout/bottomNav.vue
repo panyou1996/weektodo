@@ -1,11 +1,11 @@
 <template>
-  <div class="bottom-nav" :class="{ 'force-show-debug': true }">
-    <div class="nav-item" @click="setTodayDate" :title="$t('ui.today')">
+  <div class="bottom-nav">
+    <div class="nav-item" @click="setTodayDate" :class="{ active: isToday }" :title="$t('ui.today')">
       <i class="bi-house-fill"></i>
       <span>{{ $t('ui.today') }}</span>
     </div>
     
-    <div class="nav-item" @click="changeDate" :title="$t('ui.calendar')">
+    <div class="nav-item" @click="openDatePicker" :title="$t('ui.calendar')">
       <i class="bi-calendar3"></i>
       <span>{{ $t('ui.calendar') }}</span>
     </div>
@@ -39,131 +39,87 @@
       <span>{{ $t('settings.settings') }}</span>
     </div>
     
-    <datepicker
-      v-if="datepickerEnabled"
-      id="bottom-nav-date-picker"
-      v-model="pickedDate"
-      :locale="language"
-      :weekStartsOn="weekStartOnMonday"
-      style="display: none;"
+    <!-- 隐藏的日期选择器 -->
+    <input
+      ref="datepickerInput"
+      type="date"
+      class="hidden-datepicker"
+      @change="onDateChange"
     />
   </div>
 </template>
 
 <script>
 import moment from "moment";
-import Datepicker from "vue3-datepicker";
-import languageHelper from "../../helpers/languageHelper.js";
 
 export default {
   name: "bottomNav",
   emits: ["changeDate"],
-  components: {
-    Datepicker,
-  },
   data() {
     return {
-      datepickerEnabled: true,
-      pickedDate: new Date(),
+      isToday: true,
     };
   },
   methods: {
-    setTodayDate: function () {
+    setTodayDate() {
+      this.isToday = true;
       this.$emit("changeDate", moment().format("YYYYMMDD"));
     },
-    changeDate: function () {
-      document.getElementById("bottom-nav-date-picker").click();
+    openDatePicker() {
+      // 触发隐藏的 input[type=date]
+      this.$refs.datepickerInput.showPicker();
     },
-    addCustomList: function () {
+    onDateChange(event) {
+      const selectedDate = event.target.value;
+      if (selectedDate) {
+        this.isToday = false;
+        this.$emit("changeDate", moment(selectedDate).format("YYYYMMDD"));
+      }
+    },
+    addCustomList() {
       const listName = prompt(this.$t('ui.newCustomList'));
       if (listName && listName.trim()) {
         this.$store.dispatch("addCTodoListId", listName.trim());
       }
     },
   },
-  computed: {
-    language: function () {
-      let lang = this.$store.getters.config.language;
-      return languageHelper.getLanguagePack(lang);
-    },
-    weekStartOnMonday: function () {
-      return this.$store.getters.config.weekStartOnMonday ? 1 : 0;
-    },
-  },
-  watch: {
-    pickedDate: function (newDate) {
-      this.$emit("changeDate", moment(newDate).format("YYYYMMDD"));
-    },
-  },
 };
 </script>
 
 <style scoped lang="scss">
-/* 默认桌面端隐藏 */
+/* 隐藏的日期选择器 */
+.hidden-datepicker {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+/* 桌面端隐藏 */
 .bottom-nav {
   display: none;
 }
 
-/* 临时调试：强制显示 */
-.bottom-nav.force-show-debug {
-  display: flex !important;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: 60px;
-  background-color: #ff9800; /* 橙色，方便识别 */
-  border-top: 2px solid #f57c00;
-  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
-  z-index: 9999;  /* 超高优先级 */
-  padding-bottom: env(safe-area-inset-bottom);
-  
-  .nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    
-    i {
-      font-size: 1.4rem;
-      margin-bottom: 2px;
-      color: #fff;
-    }
-    
-    span {
-      font-size: 0.7rem;
-      color: #fff;
-    }
-    
-    &:active {
-      background-color: rgba(0, 0, 0, 0.1);
-    }
-    
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-  }
-}
-
-/* 移动端显示底部导航 */
+/* 移动端显示 - iOS 16 风格底部导航栏 */
 @media (max-width: 768px) {
   .bottom-nav {
-    display: flex !important;  /* 强制显示 */
+    display: flex;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    width: 100%;
-    height: 60px;
-    background-color: #ffffff;
-    border-top: 1px solid #e0e0e0;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 1050;  /* 高于大部分元素，但低于模态框 */
-    padding-bottom: env(safe-area-inset-bottom); /* iOS 安全区域 */
+    height: 50px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-top: 0.5px solid rgba(0, 0, 0, 0.04);
+    box-shadow: 0 -0.5px 0 0 rgba(0, 0, 0, 0.04);
+    z-index: 1050;
+    padding-bottom: env(safe-area-inset-bottom);
+    
+    /* iOS 弹性效果 */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .nav-item {
@@ -173,49 +129,72 @@ export default {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
+    position: relative;
+    padding: 4px 0;
+    
+    /* iOS 点击反馈 */
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     
     i {
       font-size: 1.4rem;
       margin-bottom: 2px;
-      color: #666;
+      color: #8e8e93;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     span {
-      font-size: 0.7rem;
-      color: #666;
+      font-size: 0.625rem;
+      font-weight: 500;
+      color: #8e8e93;
+      letter-spacing: -0.08px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
+    /* 活跃状态 */
+    &.active {
+      i {
+        color: #007aff;
+        transform: scale(1.05);
+      }
+      
+      span {
+        color: #007aff;
+      }
+    }
+    
+    /* 点击效果 */
     &:active {
-      background-color: #f5f5f5;
-    }
-    
-    &:hover {
-      i, span {
-        color: #000;
+      transform: scale(0.95);
+      
+      i {
+        transform: scale(0.9);
       }
     }
   }
 }
 
-/* 暗色主题 */
+/* 暗色主题 - iOS 16 风格 */
 @media (max-width: 768px) {
   :global(.dark-theme) .bottom-nav {
-    background-color: #161b22;
-    border-top-color: #30363d;
+    background: rgba(28, 28, 30, 0.8);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-top-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 -0.5px 0 0 rgba(255, 255, 255, 0.06);
     
     .nav-item {
       i, span {
-        color: #c9d1d9;
+        color: #98989d;
       }
       
-      &:active {
-        background-color: #21262d;
-      }
-      
-      &:hover {
-        i, span {
-          color: #ffffff;
+      &.active {
+        i {
+          color: #0a84ff;
+        }
+        
+        span {
+          color: #0a84ff;
         }
       }
     }
