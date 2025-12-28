@@ -85,11 +85,10 @@ export default {
       const data = await this.exportToJson();
       const jsonString = JSON.stringify(data);
       
-      const result = await supabaseRepository.uploadBackup(jsonString);
+      await supabaseRepository.uploadBackup(jsonString);
       
       return { success: true, message: '上传成功' };
     } catch (error) {
-      console.error('Upload to cloud failed:', error);
       return { success: false, message: error.message };
     }
   },
@@ -121,7 +120,6 @@ export default {
       // 不自动刷新，由用户决定
       return { success: true, message: '下载成功，页面将刷新', shouldReload: true };
     } catch (error) {
-      console.error('Download from cloud failed:', error);
       return { success: false, message: error.message };
     }
   },
