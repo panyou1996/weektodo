@@ -905,10 +905,5 @@ body {
   .app-body {
     zoom: 100% !important;
   }
-  
-  /* 移动端隐藏自定义列表区域，专注日历视图 */
-  .todo-lists-container:not(.weekdays) {
-    display: none;
-  }
 }
 </style>
