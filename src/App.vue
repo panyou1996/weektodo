@@ -354,11 +354,20 @@ export default {
     setSelectedDate: function (date) {
       this.selected_date = date;
       this.$nextTick(function () {
-        document
-          .getElementById("list" + date)
-          .getElementsByClassName("new-todo-input")[0]
-          .focus();
-      });
+        // 重置滚动位置以确保选中的日期在视图中间
+        this.weekResetScroll();
+        
+        // 聚焦输入框
+        setTimeout(() => {
+          const listElement = document.getElementById("list" + date);
+          if (listElement) {
+            const input = listElement.getElementsByClassName("new-todo-input")[0];
+            if (input) {
+              input.focus();
+            }
+          }
+        }, 100);
+      }.bind(this));
     },
     isElectron: function () {
       let isElectron = require("is-electron");
