@@ -83,7 +83,8 @@ export default {
   },
   computed: {
     language: function () {
-      return languageHelper.getLanguage(this.$store.getters.config.language);
+      let lang = this.$store.getters.config.language;
+      return languageHelper.getLanguagePack(lang);
     },
     weekStartOnMonday: function () {
       return this.$store.getters.config.weekStartOnMonday ? 1 : 0;
