@@ -191,7 +191,7 @@ export default {
 @media (max-width: 768px) {
   .date-navigator {
     display: flex;
-    flex-direction: column-reverse;  /* 列表在上，日期在下 */
+    flex-direction: column;  /* 日期在上，列表在下 */
     position: fixed;
     bottom: 50px; /* 在底部导航栏上方 */
     left: 0;

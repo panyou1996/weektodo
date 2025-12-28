@@ -286,6 +286,9 @@ export default {
     // 监听列表滑动，同步导航条
     this.initSwipeListener();
     
+    // 监听滑动和点击，隐藏悬浮窗口
+    this.initActiveToDoHideListener();
+    
     document.onreadystatechange = () => {
       if (document.readyState == "complete") {
         setTimeout(this.hideSplash, 2000);
@@ -695,14 +698,32 @@ export default {
     handleDateSelected: function(dateId) {
       this.selected_date = dateId;
       this.$nextTick(() => {
-        this.weekResetScroll();
-        const listElement = document.getElementById("list" + dateId);
-        if (listElement) {
-          const input = listElement.querySelector(".new-todo-input");
-          if (input) {
-            input.focus();
+        // 计算目标日期在数组中的索引
+        const dateArray = this.dates_array;
+        const targetIndex = dateArray.indexOf(dateId);
+        
+        if (targetIndex !== -1) {
+          // 滚动到对应位置
+          const container = this.$refs.weekListContainer;
+          if (container) {
+            const scrollLeft = targetIndex * this.todoListWidth();
+            container.scrollTo({
+              left: scrollLeft,
+              behavior: "smooth"
+            });
           }
         }
+        
+        // 聚焦输入框
+        setTimeout(() => {
+          const listElement = document.getElementById("list" + dateId);
+          if (listElement) {
+            const input = listElement.querySelector(".new-todo-input");
+            if (input) {
+              input.focus();
+            }
+          }
+        }, 300);
       });
     },
     handleListSelected: function(listId) {
@@ -754,6 +775,37 @@ export default {
     handleCustomScroll: function() {
       // 自定义列表滑动时，可以添加相应逻辑
       // 目前保持简单，不需要特别处理
+    },
+    // 初始化悬浮窗口隐藏监听
+    initActiveToDoHideListener: function() {
+      const weekContainer = this.$refs.weekListContainer;
+      const customContainer = this.$refs.customListContainer;
+      const activeTodoItem = document.getElementById('todo-item-active');
+      
+      if (!activeTodoItem) return;
+      
+      // 滑动时隐藏
+      const hideOnScroll = () => {
+        if (activeTodoItem) {
+          activeTodoItem.style.display = 'none';
+        }
+      };
+      
+      if (weekContainer) {
+        weekContainer.addEventListener('scroll', hideOnScroll, { passive: true });
+      }
+      
+      if (customContainer) {
+        customContainer.addEventListener('scroll', hideOnScroll, { passive: true });
+      }
+      
+      // 点击其他区域时隐藏
+      document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!activeTodoItem.contains(target) && !target.closest('.todo-item-container')) {
+          activeTodoItem.style.display = 'none';
+        }
+      });
     },
   },
   computed: {

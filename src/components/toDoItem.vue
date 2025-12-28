@@ -100,13 +100,19 @@ export default {
       const activeTodoItem = document.getElementById("todo-item-active");
       this.$nextTick(function () {
         const bounding = this.$refs.itemContainer.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        
+        // 考虑页面滚动位置
         activeTodoItem.style.width = `${bounding.width}px`;
-        activeTodoItem.style.top = `${bounding.y}px`;
-        activeTodoItem.style.left = `${bounding.x}px`;
+        activeTodoItem.style.top = `${bounding.top + scrollTop}px`;
+        activeTodoItem.style.left = `${bounding.left + scrollLeft}px`;
         activeTodoItem.style.display = `block`;
+        
+        // 检查是否超出视口
         const margin_bottom = 10;
         var offset = parseInt(window.innerHeight) - (parseInt(bounding.y) + parseInt(activeTodoItem.offsetHeight)) - margin_bottom;
-        if (offset < 0) activeTodoItem.style.top = `${bounding.y + offset}px`;
+        if (offset < 0) activeTodoItem.style.top = `${bounding.y + offset + scrollTop}px`;
       });
     },
   },
