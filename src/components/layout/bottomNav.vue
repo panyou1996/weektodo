@@ -1,12 +1,12 @@
 <template>
   <div class="bottom-nav">
     <div class="nav-item" @click="setTodayDate" :title="$t('ui.today')">
-      <i class="bi-house"></i>
+      <i class="bi-house-fill"></i>
       <span>{{ $t('ui.today') }}</span>
     </div>
     
     <div class="nav-item" @click="changeDate" :title="$t('ui.calendar')">
-      <i class="bi-calendar-event"></i>
+      <i class="bi-calendar3"></i>
       <span>{{ $t('ui.calendar') }}</span>
     </div>
     
@@ -22,12 +22,20 @@
     
     <div 
       class="nav-item"
+      :title="$t('ui.newCustomList')"
+      @click="addCustomList"
+    >
+      <i class="bi-plus-circle"></i>
+      <span>{{ $t('ui.add') }}</span>
+    </div>
+    
+    <div 
+      class="nav-item"
       data-bs-toggle="modal"
       data-bs-target="#configModal"
       :title="$t('settings.settings')"
-      @click="openConfigModal"
     >
-      <i class="bi-gear"></i>
+      <i class="bi-gear-fill"></i>
       <span>{{ $t('settings.settings') }}</span>
     </div>
     
@@ -66,8 +74,11 @@ export default {
     changeDate: function () {
       document.getElementById("bottom-nav-date-picker").click();
     },
-    openConfigModal: function () {
-      // 配置模态框打开逻辑
+    addCustomList: function () {
+      const listName = prompt(this.$t('ui.newCustomList'));
+      if (listName && listName.trim()) {
+        this.$store.dispatch("addCTodoListId", listName.trim());
+      }
     },
   },
   computed: {
@@ -140,12 +151,10 @@ export default {
 }
 
 /* 暗色主题 */
-.dark-theme {
-  @media (max-width: 768px) {
-    .bottom-nav {
-      background-color: #161b22;
-      border-top-color: #30363d;
-    }
+@media (max-width: 768px) {
+  :global(.dark-theme) .bottom-nav {
+    background-color: #161b22;
+    border-top-color: #30363d;
     
     .nav-item {
       i, span {
