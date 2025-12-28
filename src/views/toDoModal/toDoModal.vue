@@ -871,11 +871,36 @@ export default {
     min-height: auto;
   }
   
+  /* 桌面端横向排列 */
+  @media (min-width: 769px) {
+    .modal-header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .header-left {
+      flex: 1;
+    }
+    
+    .header-right {
+      flex-shrink: 0;
+    }
+  }
+  
   .header-left,
   .header-right {
     display: flex;
     align-items: center;
-    width: 100%;
+  }
+  
+  /* 移动端全宽 */
+  @media (max-width: 768px) {
+    .header-left,
+    .header-right {
+      width: 100%;
+    }
   }
   
   .header-left {
