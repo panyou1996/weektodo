@@ -240,6 +240,9 @@ export default {
       lastScrollTop: 0,
       scrollThreshold: 5,
       isNavVisible: true,
+      // 滑动检测相关
+      touchStartX: 0,
+      isSwipeDetected: false,
     };
   },
   beforeCreate() {
@@ -280,9 +283,12 @@ export default {
     // 添加滚动监听实现底部导航栏自动隐藏（已禁用）
     // this.initScrollListener();
     
+    // 监听列表滑动，同步导航条
+    this.initSwipeListener();
+    
     document.onreadystatechange = () => {
       if (document.readyState == "complete") {
-        setTimeout(this.hideSplash, 4500);
+        setTimeout(this.hideSplash, 2000);
       }
     };
 
@@ -712,6 +718,43 @@ export default {
         }
       });
     },
+    // 初始化滑动监听，同步导航条
+    initSwipeListener: function() {
+      if (window.innerWidth > 768) return; // 只在移动端生效
+      
+      const weekContainer = this.$refs.weekListContainer;
+      const customContainer = this.$refs.customListContainer;
+      
+      if (weekContainer) {
+        weekContainer.addEventListener('scroll', this.handleWeekScroll, { passive: true });
+      }
+      
+      if (customContainer) {
+        customContainer.addEventListener('scroll', this.handleCustomScroll, { passive: true });
+      }
+    },
+    handleWeekScroll: function() {
+      const container = this.$refs.weekListContainer;
+      if (!container) return;
+      
+      // 计算当前显示的日期
+      const scrollLeft = container.scrollLeft;
+      const itemWidth = this.todoListWidth();
+      const index = Math.round(scrollLeft / itemWidth);
+      
+      // 获取对应的日期
+      const dateArray = this.dates_array;
+      if (dateArray && dateArray[index]) {
+        const newDate = dateArray[index];
+        if (newDate !== this.selected_date) {
+          this.selected_date = newDate;
+        }
+      }
+    },
+    handleCustomScroll: function() {
+      // 自定义列表滑动时，可以添加相应逻辑
+      // 目前保持简单，不需要特别处理
+    },
   },
   computed: {
     dates_array: function () {
@@ -1025,7 +1068,7 @@ body {
 @media (max-width: 768px) {
   .app-body {
     overflow-x: auto;
-    padding-bottom: 120px;  /* 为底部导航栏和日期导航条预留空间 (50px + 60px + 10px) */
+    padding-bottom: 180px;  /* 为底部导航栏和两个导航条预留空间 (50px + 60px*2 + 10px) */
     touch-action: pan-x pan-y;  /* 允许双指缩放，但保持滚动 */
   }
   
@@ -1046,13 +1089,7 @@ body {
   }
   
   .slider-btn {
-    font-size: 1.8rem;
-    margin-left: 4px;
-    margin-right: 4px;
-    padding: 4px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: none;  /* 移动端隐藏左右切换按钮 */
   }
   
   .main-horizontal-divider {

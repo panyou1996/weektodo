@@ -126,7 +126,7 @@ export default {
     display: block;
     position: fixed;
     right: 20px;
-    bottom: 130px;  /* 调整位置，避免被日期导航条遮挡 (50px + 60px + 20px) */
+    bottom: 190px;  /* 调整位置，避免被两个导航条遮挡 (50px + 60px*2 + 20px) */
     z-index: 1040;
   }
   
@@ -190,14 +190,17 @@ export default {
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       color: #1c1c1e;
-      padding: 8px 16px;
-      border-radius: 10px;
+      padding: 10px 16px;
+      border-radius: 12px;
       font-size: 0.875rem;
       font-weight: 500;
       white-space: nowrap;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12),
                   0 1px 4px rgba(0, 0, 0, 0.08);
       letter-spacing: -0.02em;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
     }
     
     .fab-menu-button {
@@ -210,6 +213,7 @@ export default {
       justify-content: center;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12),
                   0 1px 4px rgba(0, 0, 0, 0.08);
+      flex-shrink: 0;
       
       i {
         font-size: 1.25rem;

@@ -1,34 +1,34 @@
 <template>
   <div class="date-navigator">
-    <div class="navigator-scroll-container" ref="scrollContainer">
+    <!-- 日期导航条 -->
+    <div v-if="showCalendar" class="navigator-scroll-container" ref="dateScrollContainer">
       <div class="navigator-items">
-        <!-- 日历模式：显示日期 -->
-        <template v-if="showCalendar">
-          <div
-            v-for="date in datesList"
-            :key="date.id"
-            class="nav-date-item"
-            :class="{ 'active': isActiveDate(date.id) }"
-            @click="selectDate(date.id)"
-          >
-            <div class="nav-date-day">{{ date.day }}</div>
-            <div class="nav-date-label">{{ date.label }}</div>
-          </div>
-        </template>
-        
-        <!-- 自定义列表模式：显示列表 -->
-        <template v-if="showCustomList">
-          <div
-            v-for="list in customLists"
-            :key="list.listId"
-            class="nav-list-item"
-            :class="{ 'active': isActiveList(list.listId) }"
-            @click="selectList(list.listId)"
-          >
-            <i class="bi-list-ul"></i>
-            <span>{{ list.listName }}</span>
-          </div>
-        </template>
+        <div
+          v-for="date in datesList"
+          :key="date.id"
+          class="nav-date-item"
+          :class="{ 'active': isActiveDate(date.id) }"
+          @click="selectDate(date.id)"
+        >
+          <div class="nav-date-day">{{ date.day }}</div>
+          <div class="nav-date-label">{{ date.label }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 自定义列表导航条 -->
+    <div v-if="showCustomList" class="navigator-scroll-container custom-list-nav" ref="listScrollContainer">
+      <div class="navigator-items">
+        <div
+          v-for="list in customLists"
+          :key="list.listId"
+          class="nav-list-item"
+          :class="{ 'active': isActiveList(list.listId) }"
+          @click="selectList(list.listId)"
+        >
+          <i class="bi-list-ul"></i>
+          <span>{{ list.listName }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -87,11 +87,11 @@ export default {
         
         let label = date.format("ddd");
         if (i === 0) {
-          label = this.$t("ui.today") || "今天";
+          label = "Today";
         } else if (i === 1) {
-          label = this.$t("ui.tomorrow") || "明天";
+          label = "Tmr";  // Tomorrow 缩写
         } else if (i === -1) {
-          label = this.$t("ui.yesterday") || "昨天";
+          label = "Yst";  // Yesterday 缩写
         }
         
         dates.push({
@@ -145,22 +145,36 @@ export default {
     },
     scrollToActive() {
       this.$nextTick(() => {
-        const container = this.$refs.scrollContainer;
-        const activeItem = container?.querySelector(".active");
-        
-        if (activeItem && container) {
-          const containerWidth = container.offsetWidth;
-          const itemLeft = activeItem.offsetLeft;
-          const itemWidth = activeItem.offsetWidth;
-          
-          // 计算滚动位置，使选中项居中
-          const scrollLeft = itemLeft - (containerWidth / 2) + (itemWidth / 2);
-          
-          container.scrollTo({
-            left: scrollLeft,
-            behavior: "smooth"
-          });
+        // 滚动日期导航条
+        const dateContainer = this.$refs.dateScrollContainer;
+        if (dateContainer) {
+          const activeItem = dateContainer.querySelector(".active");
+          if (activeItem) {
+            this.scrollItemToCenter(dateContainer, activeItem);
+          }
         }
+        
+        // 滚动列表导航条
+        const listContainer = this.$refs.listScrollContainer;
+        if (listContainer) {
+          const activeItem = listContainer.querySelector(".active");
+          if (activeItem) {
+            this.scrollItemToCenter(listContainer, activeItem);
+          }
+        }
+      });
+    },
+    scrollItemToCenter(container, item) {
+      const containerWidth = container.offsetWidth;
+      const itemLeft = item.offsetLeft;
+      const itemWidth = item.offsetWidth;
+      
+      // 计算滚动位置，使选中项居中
+      const scrollLeft = itemLeft - (containerWidth / 2) + (itemWidth / 2);
+      
+      container.scrollTo({
+        left: scrollLeft,
+        behavior: "smooth"
       });
     }
   }
@@ -176,23 +190,23 @@ export default {
 /* 移动端显示 */
 @media (max-width: 768px) {
   .date-navigator {
-    display: block;
+    display: flex;
+    flex-direction: column-reverse;  /* 列表在上，日期在下 */
     position: fixed;
     bottom: 50px; /* 在底部导航栏上方 */
     left: 0;
     right: 0;
+    z-index: 1049;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .navigator-scroll-container {
     height: 60px;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border-top: 0.5px solid rgba(0, 0, 0, 0.04);
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
-    z-index: 1049;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  
-  .navigator-scroll-container {
-    height: 100%;
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
@@ -201,6 +215,12 @@ export default {
     &::-webkit-scrollbar {
       display: none; /* Chrome, Safari */
     }
+  }
+  
+  /* 自定义列表导航样式差异 */
+  .custom-list-nav {
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.04);
+    border-top: none;
   }
   
   .navigator-items {
@@ -313,10 +333,14 @@ export default {
   }
   
   /* 暗色主题 */
-  :global(.dark-theme) .date-navigator {
+  :global(.dark-theme) .navigator-scroll-container {
     background: rgba(28, 28, 30, 0.95);
     border-top-color: rgba(255, 255, 255, 0.06);
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  :global(.dark-theme) .custom-list-nav {
+    border-bottom-color: rgba(255, 255, 255, 0.06);
   }
   
   :global(.dark-theme) .nav-date-item {
@@ -368,8 +392,8 @@ export default {
 
 /* 滚动指示器（可选） */
 @media (max-width: 768px) {
-  .date-navigator::before,
-  .date-navigator::after {
+  .navigator-scroll-container::before,
+  .navigator-scroll-container::after {
     content: '';
     position: absolute;
     top: 0;
@@ -379,27 +403,27 @@ export default {
     z-index: 1;
   }
   
-  .date-navigator::before {
+  .navigator-scroll-container::before {
     left: 0;
     background: linear-gradient(to right, 
       rgba(255, 255, 255, 0.95) 0%, 
       rgba(255, 255, 255, 0) 100%);
   }
   
-  .date-navigator::after {
+  .navigator-scroll-container::after {
     right: 0;
     background: linear-gradient(to left, 
       rgba(255, 255, 255, 0.95) 0%, 
       rgba(255, 255, 255, 0) 100%);
   }
   
-  :global(.dark-theme) .date-navigator::before {
+  :global(.dark-theme) .navigator-scroll-container::before {
     background: linear-gradient(to right, 
       rgba(28, 28, 30, 0.95) 0%, 
       rgba(28, 28, 30, 0) 100%);
   }
   
-  :global(.dark-theme) .date-navigator::after {
+  :global(.dark-theme) .navigator-scroll-container::after {
     background: linear-gradient(to left, 
       rgba(28, 28, 30, 0.95) 0%, 
       rgba(28, 28, 30, 0) 100%);
