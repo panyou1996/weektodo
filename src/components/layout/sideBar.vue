@@ -190,6 +190,27 @@ export default {
   background-color: #fcfcfc;
 }
 
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .side-bar {
+    width: 3rem;
+    
+    > i,
+    .sidebar-icon {
+      font-size: 1.1rem;
+      padding: 8px;
+      margin-bottom: 6px;
+    }
+    
+    .logo {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 4px;
+      margin-top: 6px;
+    }
+  }
+}
+
 .side-bar > i:first-child {
   margin-bottom: 14px;
   margin-top: 8px;

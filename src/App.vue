@@ -854,4 +854,36 @@ body {
 .full-screen-divider {
   height: 100% !important;
 }
+
+/* 移动端全局适配 */
+@media (max-width: 768px) {
+  .app-body {
+    overflow-x: auto;
+  }
+  
+  .todo-lists-container {
+    margin-top: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .slider-btn {
+    font-size: 1.5rem;
+    margin-left: 2px;
+    margin-right: 2px;
+    padding: 2px;
+  }
+  
+  .main-horizontal-divider {
+    min-height: 3px;
+  }
+  
+  .divider-icons {
+    padding: 4px;
+  }
+  
+  /* 隐藏 zoom 功能，移动端不适用 */
+  .app-body {
+    zoom: 100% !important;
+  }
+}
 </style>

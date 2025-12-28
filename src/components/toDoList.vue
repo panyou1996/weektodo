@@ -212,6 +212,28 @@ export default {
   margin-bottom: 5px;
 }
 
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .to-do-list-container {
+    padding-left: 6px;
+    padding-right: 6px;
+    min-width: 140px;
+  }
+  
+  .todo-input {
+    font-size: 0.75rem;
+    padding: 0 4px;
+  }
+  
+  .weekly-to-do-header h4 {
+    font-size: 0.9rem;
+  }
+  
+  .weekly-to-do-header i {
+    font-size: 1.1rem;
+  }
+}
+
 .to-do-fake-item {
   height: 1.2rem;
   width: 100%;

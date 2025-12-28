@@ -225,6 +225,30 @@ export default {
   min-height: 25px;
 }
 
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .weekly-to-do-header {
+    margin-bottom: 15px;
+    margin-top: 8px;
+  }
+  
+  .weekly-to-do-header h4 {
+    font-size: 16px;
+    min-height: 20px;
+    margin-bottom: 2px;
+  }
+  
+  .weekly-to-do-subheader {
+    font-size: 10px;
+  }
+  
+  .header-menu-icons {
+    font-size: 16px !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
 .weekly-to-do-subheader {
   margin-top: 0px;
   font-size: 12px;

@@ -157,6 +157,26 @@ export default {
   padding: 0 3px 0 7px;
 }
 
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .item-text {
+    font-size: 0.75rem;
+    padding: 0 2px 0 4px;
+    line-height: 1.2rem;
+    min-height: 1.1rem;
+  }
+  
+  .item-time {
+    font-size: 0.7rem;
+    padding: 0 1px;
+  }
+  
+  input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+  }
+}
+
 .item-text.compact-view {
   overflow: hidden;
   white-space: nowrap;
