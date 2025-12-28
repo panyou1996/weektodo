@@ -871,6 +871,55 @@ export default {
   text-decoration: line-through;
 }
 
+/* 模态框样式 - 全局应用 */
+.modal-content {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
+              0 4px 16px rgba(0, 0, 0, 0.08);
+  
+  :global(.dark-theme) & {
+    background: rgba(28, 28, 30, 0.98);
+  }
+}
+
+/* 头部优化 - 参照搜索模态框设计 */
+.modal-header {
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+  padding: 16px 20px;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: auto;
+  
+  :global(.dark-theme) & {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-left {
+  flex: 1;
+  justify-content: flex-start;
+  min-width: 0;  /* 允许内容收缩 */
+}
+
+.header-right {
+  flex-shrink: 0;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
 /* 移动端适配 - iOS 16 风格 */
 @media (max-width: 768px) {
   .modal-dialog {
@@ -883,51 +932,6 @@ export default {
     max-height: calc(100vh - 80px);
     display: flex;
     flex-direction: column;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-radius: 16px;
-    border: none;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
-                0 4px 16px rgba(0, 0, 0, 0.08);
-    
-    :global(.dark-theme) & {
-      background: rgba(28, 28, 30, 0.98);
-    }
-  }
-  
-  /* 头部优化 - 参照搜索模态框设计 */
-  .modal-header {
-    border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
-    padding: 16px 20px;
-    border-radius: 16px 16px 0 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    min-height: auto;
-    
-    :global(.dark-theme) & {
-      border-bottom-color: rgba(255, 255, 255, 0.1);
-    }
-  }
-  
-  .header-left,
-  .header-right {
-    display: flex;
-    align-items: center;
-  }
-  
-  .header-left {
-    flex: 1;
-    justify-content: flex-start;
-    min-width: 0;  /* 允许内容收缩 */
-  }
-  
-  .header-right {
-    flex-shrink: 0;
-    justify-content: flex-end;
-    gap: 6px;
   }
   
   /* 日期选择器 */
