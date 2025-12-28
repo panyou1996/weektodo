@@ -1,5 +1,5 @@
 <template>
-  <div class="bottom-nav">
+  <div class="bottom-nav" :class="{ 'force-show-debug': true }">
     <div class="nav-item" @click="setTodayDate" :title="$t('ui.today')">
       <i class="bi-house-fill"></i>
       <span>{{ $t('ui.today') }}</span>
@@ -101,6 +101,51 @@ export default {
 /* 默认桌面端隐藏 */
 .bottom-nav {
   display: none;
+}
+
+/* 临时调试：强制显示 */
+.bottom-nav.force-show-debug {
+  display: flex !important;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #ff9800; /* 橙色，方便识别 */
+  border-top: 2px solid #f57c00;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 9999;  /* 超高优先级 */
+  padding-bottom: env(safe-area-inset-bottom);
+  
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    i {
+      font-size: 1.4rem;
+      margin-bottom: 2px;
+      color: #fff;
+    }
+    
+    span {
+      font-size: 0.7rem;
+      color: #fff;
+    }
+    
+    &:active {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
 }
 
 /* 移动端显示底部导航 */
