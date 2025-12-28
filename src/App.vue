@@ -126,13 +126,6 @@
     <!-- 移动端底部导航栏 -->
     <bottom-nav @change-date="setSelectedDate"></bottom-nav>
     
-    <!-- 移动端日期/列表导航条 -->
-    <date-navigator 
-      :current-date="selected_date"
-      @date-selected="handleDateSelected"
-      @list-selected="handleListSelected"
-    ></date-navigator>
-    
     <!-- 移动端快速添加浮动按钮 -->
     <fab-button @change-date="setSelectedDate"></fab-button>
     
@@ -168,7 +161,6 @@ import toDoList from "./components/toDoList";
 import moment from "moment";
 import sideBar from "./components/layout/sideBar";
 import bottomNav from "./components/layout/bottomNav";
-import dateNavigator from "./components/layout/dateNavigator";
 import customToDoListIdsRepository from "./repositories/customToDoListIdsRepository";
 import removeCustomList from "./components/comfirmModals/removeCustomList";
 import configModal from "./views/configModal";
@@ -206,7 +198,6 @@ export default {
     toDoList,
     sideBar,
     bottomNav,
-    dateNavigator,
     removeCustomList,
     splashScreen,
     aboutModal,
@@ -694,57 +685,6 @@ export default {
       
       this.lastScrollTop = scrollTop;
     },
-    // 处理日期导航条选择
-    handleDateSelected: function(dateId) {
-      const currentDate = this.selected_date;
-      
-      // 先更新选中日期
-      this.selected_date = dateId;
-      
-      this.$nextTick(() => {
-        // 计算日期差值，确定滚动方向
-        const current = moment(currentDate, "YYYYMMDD");
-        const target = moment(dateId, "YYYYMMDD");
-        const diffDays = target.diff(current, "days");
-        
-        const container = this.$refs.weekListContainer;
-        if (container) {
-          // 直接滚动到目标位置，不依赖数组索引
-          const currentScroll = container.scrollLeft;
-          const itemWidth = this.todoListWidth();
-          const targetScroll = currentScroll + (diffDays * itemWidth);
-          
-          container.scrollTo({
-            left: targetScroll,
-            behavior: "smooth"
-          });
-        }
-        
-        // 聚焦输入框
-        setTimeout(() => {
-          const listElement = document.getElementById("list" + dateId);
-          if (listElement) {
-            const input = listElement.querySelector(".new-todo-input");
-            if (input) {
-              input.focus();
-            }
-          }
-        }, 300);
-      });
-    },
-    handleListSelected: function(listId) {
-      // 切换到自定义列表
-      this.$nextTick(() => {
-        const listElement = document.getElementById("list" + listId);
-        if (listElement) {
-          listElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
-          const input = listElement.querySelector(".new-todo-input");
-          if (input) {
-            input.focus();
-          }
-        }
-      });
-    },
     // 初始化滑动监听，同步导航条
     initSwipeListener: function() {
       if (window.innerWidth > 768) return; // 只在移动端生效
@@ -1126,7 +1066,7 @@ body {
 @media (max-width: 768px) {
   .app-body {
     overflow-x: auto;
-    padding-bottom: 180px;  /* 为底部导航栏和两个导航条预留空间 (50px + 60px*2 + 10px) */
+    padding-bottom: 70px;  /* 为底部导航栏预留空间 */
     touch-action: pan-x pan-y;  /* 允许双指缩放，但保持滚动 */
   }
   
