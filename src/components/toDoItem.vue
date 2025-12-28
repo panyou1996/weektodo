@@ -1,7 +1,10 @@
 <template>
   <div class="item-drop-zone" @dragenter.self="onDragenter" @dragleave.self="onDragleave" @drop="onDragleave"
     :class="[{ 'drag-hover': todoDragHover }]">
-    <div class="todo-item-container" :class="{ 'compact-view': compactView }" ref="itemContainer">
+    <div class="todo-item-container" :class="{ 'compact-view': compactView, 'card-style': !compactView }" ref="itemContainer">
+      <!-- 左侧彩色标签 -->
+      <div v-if="toDo.color != 'none' && !compactView" class="color-tag" :style="{ backgroundColor: toDo.color }"></div>
+      
       <div v-if="!editing" class="inline-todo-item d-flex flex-column" @mouseenter="showToDoItem">
         <div class="d-flex">
           <span class="noselect item-text" :class="{ 'checked-todo': toDo.checked, 'compact-view': compactView }"
@@ -122,6 +125,58 @@ export default {
 </script>
 
 <style scoped lang="scss">
+/* 卡片化布局 */
+.todo-item-container.card-style {
+  position: relative;
+  background: #ffffff;
+  border-radius: 12px;
+  margin: 6px 8px;
+  padding: 10px 12px;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+              0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12),
+                0 2px 4px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1),
+                0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .dark-theme & {
+    background: #1c1c1e;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3),
+                0 1px 2px rgba(0, 0, 0, 0.2);
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4),
+                  0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
+/* 左侧彩色标签 */
+.color-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 12px 0 0 12px;
+  opacity: 0.9;
+  transition: opacity 0.2s;
+  
+  .todo-item-container:hover & {
+    opacity: 1;
+  }
+}
+
 .todo-item-container {
   border-bottom: 1px solid #eaecef;
   min-height: 26px;
@@ -159,6 +214,31 @@ export default {
 
 /* 移动端适配 */
 @media (max-width: 768px) {
+  /* 移动端卡片样式优化 */
+  .todo-item-container.card-style {
+    margin: 8px 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06),
+                0 1px 4px rgba(0, 0, 0, 0.04);
+    
+    &:active {
+      transform: scale(0.98);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08),
+                  0 0.5px 2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .dark-theme & {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4),
+                  0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  .color-tag {
+    width: 5px;
+    border-radius: 14px 0 0 14px;
+  }
+  
   .item-text {
     font-size: 0.875rem;  /* 增大字体 */
     padding: 0 4px 0 6px;
@@ -184,7 +264,7 @@ export default {
   }
   
   .todo-item-container {
-    min-height: 40px;  /* 增加最小高度，方便点击 */
+    min-height: 44px;  /* iOS 触摸标准 */
     padding: 4px 0;
   }
 }

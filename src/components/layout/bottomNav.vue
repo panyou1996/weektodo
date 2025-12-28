@@ -118,8 +118,9 @@ export default {
     z-index: 1050;
     padding-bottom: env(safe-area-inset-bottom);
     
-    /* iOS 弹性效果 */
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* iOS 弹性效果 - 优化动画 */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    will-change: transform;
   }
   
   .nav-item {

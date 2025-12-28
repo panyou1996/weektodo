@@ -125,6 +125,12 @@
     
     <!-- 移动端底部导航栏 -->
     <bottom-nav @change-date="setSelectedDate"></bottom-nav>
+    
+    <!-- 移动端快速添加浮动按钮 -->
+    <fab-button @change-date="setSelectedDate"></fab-button>
+    
+    <!-- 搜索模态框 -->
+    <search-modal></search-modal>
 
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1056">
       <toast-message
@@ -181,6 +187,8 @@ import ReorderCustomListsModal from "./views/ReorderCustomListsModal.vue";
 import toastMessage from "./components/toastMessage";
 import activeToDo from "./components/activeToDo.vue";
 import tasksHelper from "./helpers/tasksHelper";
+import fabButton from "./components/fabButton.vue";
+import searchModal from "./components/searchModal.vue";
 
 export default {
   name: "App",
@@ -203,6 +211,8 @@ export default {
     clearListModal,
     toastMessage,
     activeToDo,
+    fabButton,
+    searchModal,
   },
   data() {
     return {
@@ -213,6 +223,14 @@ export default {
       initialLoadCompleted: false,
       initialListToLoad: 0,
       initialListLoaded: 0,
+      // 双指缩放相关
+      initialPinchDistance: 0,
+      currentScale: 1,
+      isPinching: false,
+      // 底部导航栏隐藏相关
+      lastScrollTop: 0,
+      scrollThreshold: 5,
+      isNavVisible: true,
     };
   },
   beforeCreate() {
@@ -246,6 +264,13 @@ export default {
     this.$refs.weekListContainer.scrollLeft = this.todoListWidth();
     this.calendarHeight = this.$store.getters.config.calendarHeight;
     window.addEventListener("resize", this.weekResetScroll);
+    
+    // 添加双指缩放事件监听
+    this.initPinchZoom();
+    
+    // 添加滚动监听实现底部导航栏自动隐藏
+    this.initScrollListener();
+    
     document.onreadystatechange = () => {
       if (document.readyState == "complete") {
         setTimeout(this.hideSplash, 4500);
@@ -550,6 +575,106 @@ export default {
       ipcRenderer.send("set-open-on-startup", this.$store.getters.config.openOnStartup);
       ipcRenderer.send("set-run-in-background", this.$store.getters.config.runInBackground);
       ipcRenderer.send("set-dark-tray-icon", this.$store.getters.config.darkTrayIcon);
+    },
+    // 初始化双指缩放功能
+    initPinchZoom: function () {
+      const appContainer = document.getElementById("app-container");
+      if (!appContainer) return;
+
+      // 从 localStorage 加载保存的缩放比例
+      const savedScale = localStorage.getItem("pinchZoomScale");
+      if (savedScale) {
+        this.currentScale = parseFloat(savedScale);
+        this.applyScale(this.currentScale);
+      }
+
+      appContainer.addEventListener("touchstart", this.handleTouchStart, { passive: false });
+      appContainer.addEventListener("touchmove", this.handleTouchMove, { passive: false });
+      appContainer.addEventListener("touchend", this.handleTouchEnd, { passive: false });
+    },
+    handleTouchStart: function (e) {
+      if (e.touches.length === 2) {
+        this.isPinching = true;
+        this.initialPinchDistance = this.getPinchDistance(e.touches);
+        e.preventDefault();
+      }
+    },
+    handleTouchMove: function (e) {
+      if (this.isPinching && e.touches.length === 2) {
+        e.preventDefault();
+        const currentDistance = this.getPinchDistance(e.touches);
+        const scaleChange = currentDistance / this.initialPinchDistance;
+        
+        // 计算新的缩放比例（限制在 0.7 到 1.5 之间）
+        let newScale = this.currentScale * scaleChange;
+        newScale = Math.max(0.7, Math.min(1.5, newScale));
+        
+        this.applyScale(newScale);
+        this.initialPinchDistance = currentDistance;
+        this.currentScale = newScale;
+      }
+    },
+    handleTouchEnd: function (e) {
+      if (e.touches.length < 2) {
+        if (this.isPinching) {
+          // 保存缩放比例到 localStorage
+          localStorage.setItem("pinchZoomScale", this.currentScale.toString());
+        }
+        this.isPinching = false;
+      }
+    },
+    getPinchDistance: function (touches) {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    },
+    applyScale: function (scale) {
+      const appBody = document.querySelector(".app-body");
+      if (appBody) {
+        // 使用 CSS 变量来调整字体大小和间距
+        const baseFontSize = 16; // 默认字体大小
+        const newFontSize = baseFontSize * scale;
+        
+        appBody.style.setProperty("--scale-factor", scale);
+        document.documentElement.style.fontSize = `${newFontSize}px`;
+      }
+    },
+    // 初始化滚动监听，实现底部导航栏动态隐藏
+    initScrollListener: function () {
+      if (window.innerWidth > 768) return; // 只在移动端生效
+      
+      const scrollContainers = [
+        document.querySelector(".app-body"),
+        ...document.querySelectorAll(".todo-slider"),
+        ...document.querySelectorAll(".todo-lists-container")
+      ];
+      
+      scrollContainers.forEach(container => {
+        if (container) {
+          container.addEventListener("scroll", this.handleScroll, { passive: true });
+        }
+      });
+    },
+    handleScroll: function (e) {
+      const scrollTop = e.target.scrollTop || e.target.scrollLeft || 0;
+      const scrollDiff = scrollTop - this.lastScrollTop;
+      
+      if (Math.abs(scrollDiff) < this.scrollThreshold) return;
+      
+      const bottomNav = document.querySelector(".bottom-nav");
+      if (!bottomNav) return;
+      
+      if (scrollDiff > 0 && this.isNavVisible) {
+        // 向下滚动，隐藏导航栏
+        bottomNav.style.transform = "translateY(100%)";
+        this.isNavVisible = false;
+      } else if (scrollDiff < 0 && !this.isNavVisible) {
+        // 向上滚动，显示导航栏
+        bottomNav.style.transform = "translateY(0)";
+        this.isNavVisible = true;
+      }
+      
+      this.lastScrollTop = scrollTop;
     },
   },
   computed: {
@@ -865,6 +990,7 @@ body {
   .app-body {
     overflow-x: auto;
     padding-bottom: 70px;  /* 为底部导航栏预留空间 */
+    touch-action: pan-x pan-y;  /* 允许双指缩放，但保持滚动 */
   }
   
   .todo-lists-container {
@@ -904,6 +1030,23 @@ body {
   /* 隐藏 zoom 功能，移动端不适用 */
   .app-body {
     zoom: 100% !important;
+  }
+}
+
+/* 双指缩放视觉反馈 */
+.app-body {
+  transition: font-size 0.1s ease-out;
+}
+
+/* 禁用浏览器默认双指缩放 */
+@media (max-width: 768px) {
+  html {
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+  
+  body {
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
   }
 }
 </style>
