@@ -1,7 +1,7 @@
 <template>
   <input class="hidden-input-for-focus" type="text" />
   <div v-show="compatible" id="app-container" class="app-container" :class="{ 'dark-theme': darkTheme }">
-    <div class="hidden-mobile app-body" :style="{ zoom: `${zoom}%` }">
+    <div class="app-body" :style="{ zoom: `${zoom}%` }">
       <splash-screen ref="splash"></splash-screen>
       <side-bar @change-date="setSelectedDate"></side-bar>
 
@@ -121,10 +121,6 @@
       <importing-modal :id="'exportingModal'" :text="$t('settings.exporting')"></importing-modal>
 
       <reorder-custom-lists-modal @reset-custom-list="resetCustomList"></reorder-custom-lists-modal>
-    </div>
-    <div class="mobile d-flex flex-column justify-content-center align-items-center">
-      <i class="bi-exclamation-diamond mb-4" style="font-size: 100px"></i>
-      <h3 style="text-align: center">{{ $t("ui.mobileWarning") }}</h3>
     </div>
 
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1056">
