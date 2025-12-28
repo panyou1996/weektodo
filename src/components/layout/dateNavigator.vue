@@ -78,7 +78,6 @@ export default {
   },
   methods: {
     generateDatesList() {
-      const today = moment();
       const dates = [];
       
       // 生成前7天到后14天的日期
